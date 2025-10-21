@@ -1,0 +1,48 @@
+{
+  "name": "nexuscomm-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.3",
+    "tailwindcss": "^3.4.0",
+    "socket.io-client": "^4.7.2",
+    "zustand": "^4.4.7",
+    "axios": "^1.6.2",
+    "date-fns": "^2.30.0",
+    "react-hot-toast": "^2.4.1",
+    "react-query": "^3.39.3",
+    "headlessui": "^1.7.17",
+    "heroicons": "^2.0.18",
+    "quill": "^2.0.0",
+    "react-quill": "^2.0.0",
+    "react-virtual": "^3.5.0",
+    "framer-motion": "^10.16.16",
+    "react-markdown": "^9.0.1",
+    "remark-gfm": "^4.0.0",
+    "clsx": "^2.0.0",
+    "zustand-persist": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@types/node": "^20.10.4",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^14.0.0",
+    "@testing-library/react": "^14.1.2",
+    "jest": "^29.7.0",
+    "@testing-library/jest-dom": "^6.1.5"
+  }
+}

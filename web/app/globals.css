@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  @apply box-border;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply antialiased;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-neutral-100 dark:bg-neutral-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-neutral-300 dark:bg-neutral-600 rounded-full hover:bg-neutral-400 dark:hover:bg-neutral-500;
+}
+
+/* Message bubble animation */
+@keyframes slideIn {
+  from {
+    @apply opacity-0 translate-y-2;
+  }
+  to {
+    @apply opacity-100 translate-y-0;
+  }
+}
+
+.message-enter {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Typing indicator animation */
+@keyframes pulse-dot {
+  0%, 60%, 100% {
+    @apply opacity-30;
+  }
+  30% {
+    @apply opacity-100;
+  }
+}
+
+.typing-indicator span {
+  animation: pulse-dot 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Focus ring for accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-950;
+}
+
+/* Utility classes */
+.text-truncate {
+  @apply truncate;
+}
+
+.line-clamp-1 {
+  @apply line-clamp-1;
+}
+
+.line-clamp-2 {
+  @apply line-clamp-2;
+}
+
+/* Container queries fallback */
+@supports (container-type: inline-size) {
+  @container (max-width: 600px) {
+    .container-mobile {
+      @apply flex flex-col;
+    }
+  }
+}
+
+/* Performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    @apply animation-none transition-none !important;
+  }
+}

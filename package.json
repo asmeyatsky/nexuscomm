@@ -6,12 +6,13 @@
   "workspaces": [
     "backend",
     "mobile",
+    "web",
     "shared"
   ],
   "scripts": {
-    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix mobile run dev\"",
-    "build": "npm --prefix backend run build && npm --prefix mobile run build",
-    "test": "npm --prefix backend run test && npm --prefix mobile run test",
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix web run dev\" \"npm --prefix mobile run dev\"",
+    "build": "npm --prefix backend run build && npm --prefix web run build && npm --prefix mobile run build",
+    "test": "npm --prefix backend run test && npm --prefix web run test && npm --prefix mobile run test",
     "lint": "npm --prefix backend run lint && npm --prefix mobile run lint",
     "clean": "rm -rf node_modules backend/node_modules mobile/node_modules shared/node_modules",
     "setup": "npm install"
