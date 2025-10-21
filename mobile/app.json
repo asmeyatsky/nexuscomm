@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "NexusComm",
+    "slug": "nexuscomm",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/icons/app-icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./src/assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTabletMode": true,
+      "bundleIdentifier": "com.nexuscomm.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/icons/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.nexuscomm.app"
+    },
+    "web": {
+      "favicon": "./src/assets/icons/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to share messages.",
+          "cameraPermission": "The app accesses your camera to take photos."
+        }
+      ]
+    ],
+    "scheme": "nexuscomm",
+    "extra": {
+      "eas": {
+        "projectId": "nexuscomm"
+      },
+      "apiUrl": "http://localhost:3000/api"
+    }
+  }
+}

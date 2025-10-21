@@ -1,0 +1,48 @@
+{
+  "name": "nexuscomm-backend",
+  "version": "0.1.0",
+  "description": "NexusComm Gateway - Backend service for unified communications",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "migrate": "tsx src/database/migrate.ts",
+    "db:reset": "tsx src/database/reset.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.2",
+    "typeorm": "^0.3.17",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.1.2",
+    "bcrypt": "^5.1.1",
+    "axios": "^1.6.2",
+    "ws": "^8.15.0",
+    "pino": "^8.17.2",
+    "pino-http": "^8.6.1",
+    "crypto": "^1.0.1",
+    "bull": "^4.11.4",
+    "redis": "^4.6.11",
+    "throttle-debounce": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "@types/express": "^4.17.21",
+    "@types/bcrypt": "^5.0.2",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0",
+    "vitest": "^1.0.4",
+    "@vitest/ui": "^1.0.4",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0"
+  }
+}
