@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,12 @@ import {
   Modal,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
-import { useAccountStore, useMessageStore } from '@store/index';
+import { useAccountStore, useMessageStore, useConversationStore } from '@store/index';
 import { apiService } from '@services/api';
+import { voiceService } from '@services/voiceService';
+import { messageSendingService } from '@services/messageSendingService';
 import { Account, ChannelType } from '@types/index';
 
 interface ContextualReplyProps {
@@ -29,14 +32,18 @@ export const ContextualReply: React.FC<ContextualReplyProps> = ({
   onMessageSent,
 }) => {
   const { accounts } = useAccountStore();
+  const { conversations, selectedConversation } = useConversationStore();
   const { addMessage } = useMessageStore();
   const [content, setContent] = useState('');
   const [selectedChannel, setSelectedChannel] = useState<ChannelType | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showChannelPicker, setShowChannelPicker] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedText, setRecordedText] = useState('');
 
   const availableChannels = Array.from(new Set(accounts.map((a) => a.channelType)));
+  const conversation = selectedConversation?.id === conversationId ? selectedConversation : conversations.find(c => c.id === conversationId) || null;
 
   const handleChannelSelect = (channel: ChannelType) => {
     setSelectedChannel(channel);
@@ -45,25 +52,83 @@ export const ContextualReply: React.FC<ContextualReplyProps> = ({
     setShowChannelPicker(false);
   };
 
+  const handleVoiceInput = useCallback(async () => {
+    if (isRecording) {
+      // Stop recording
+      await voiceService.stopListening();
+      setIsRecording(false);
+      return;
+    }
+
+    try {
+      // Check if voice recognition is available
+      const isAvailable = await voiceService.isAvailable();
+      if (!isAvailable) {
+        Alert.alert('Voice Recognition', 'Voice recognition is not available on this device.');
+        return;
+      }
+
+      setIsRecording(true);
+      setRecordedText('');
+      
+      voiceService.startListening((text) => {
+        if (text) {
+          // Append to current content
+          setContent(prev => prev ? `${prev} ${text}` : text);
+          setRecordedText(text);
+        }
+        setIsRecording(false);
+      });
+    } catch (error) {
+      console.error('Error starting voice recognition:', error);
+      Alert.alert('Error', 'Failed to start voice recognition.');
+      setIsRecording(false);
+    }
+  }, [isRecording]);
+
   const handleSend = useCallback(async () => {
-    if (!content.trim() || !selectedChannel || !selectedAccount) {
-      alert('Please select a channel and enter a message');
+    if (!content.trim()) {
+      alert('Please enter a message');
       return;
     }
 
     try {
       setIsLoading(true);
 
-      const message = await apiService.sendMessage(
-        conversationId,
-        content,
-        []
-      );
+      let message;
+      if (selectedChannel && selectedAccount) {
+        // Use manual channel selection
+        message = await apiService.sendMessage(
+          conversationId,
+          content,
+          []
+        );
+      } else {
+        // Use automatic platform selection
+        if (conversation) {
+          message = await messageSendingService.processAndSendMessage({
+            conversationId,
+            content,
+            inputMethod: recordedText ? 'voice' : 'text',
+            conversation,
+            accounts,
+            mediaUrls: []
+          });
+        } else {
+          // Fallback to default behavior
+          message = await apiService.sendMessage(
+            conversationId,
+            content,
+            []
+          );
+        }
+      }
 
       addMessage(message);
       setContent('');
       setSelectedChannel(null);
       setSelectedAccount(null);
+      setRecordedText('');
 
       if (onMessageSent) {
         onMessageSent();
@@ -75,7 +140,7 @@ export const ContextualReply: React.FC<ContextualReplyProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [content, selectedChannel, selectedAccount, conversationId, addMessage, onMessageSent, onClose]);
+  }, [content, selectedChannel, selectedAccount, conversationId, conversation, accounts, addMessage, recordedText, onMessageSent, onClose]);
 
   return (
     <Modal
@@ -144,16 +209,30 @@ export const ContextualReply: React.FC<ContextualReplyProps> = ({
             editable={!isLoading}
             placeholderTextColor="#999"
           />
+          
+          {/* Voice Input Button */}
+          <TouchableOpacity
+            style={[
+              styles.voiceButton,
+              isRecording && styles.voiceButtonActive
+            ]}
+            onPress={handleVoiceInput}
+            disabled={isLoading}
+          >
+            <Text style={styles.voiceButtonText}>
+              {isRecording ? '● Stop' : '🎤 Voice'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Send Button */}
         <TouchableOpacity
           style={[
             styles.sendButton,
-            (!content.trim() || !selectedChannel) && styles.sendButtonDisabled,
+            (!content.trim()) && styles.sendButtonDisabled,
           ]}
           onPress={handleSend}
-          disabled={!content.trim() || !selectedChannel || isLoading}
+          disabled={!content.trim() || isLoading}
         >
           {isLoading ? (
             <ActivityIndicator color="#ffffff" />
@@ -264,6 +343,23 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 14,
     textAlignVertical: 'top',
+  },
+  voiceButton: {
+    position: 'absolute',
+    right: 10,
+    bottom: 10,
+    backgroundColor: '#f3f4f6',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+  },
+  voiceButtonActive: {
+    backgroundColor: '#dc2626', // Red background when recording
+  },
+  voiceButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1f2937',
   },
   sendButton: {
     backgroundColor: '#3b82f6',

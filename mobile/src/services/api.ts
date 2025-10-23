@@ -163,10 +163,42 @@ class ApiService {
   }
 
   // Message endpoints
-  async sendMessage(conversationId: string, content: string, mediaUrls?: string[]) {
+  async sendMessage(conversationId: string, content: string, mediaUrls?: string[], autoSelectPlatform?: boolean) {
     const response = await this.client.post('/messages', {
       conversationId,
       content,
+      mediaUrls,
+      autoSelectPlatform,
+    });
+    return response.data.data.message;
+  }
+
+  // Voice message endpoint
+  async sendVoiceMessage(conversationId: string, voiceContent: string, targetPlatform?: string, mediaUrls?: string[]) {
+    const response = await this.client.post('/messages/voice', {
+      conversationId,
+      voiceContent,
+      targetPlatform,
+      mediaUrls,
+    });
+    return response.data.data.message;
+  }
+
+  // Email message endpoint
+  async sendEmailMessage(conversationId: string, emailData: any) {
+    const response = await this.client.post('/messages/email', {
+      conversationId,
+      emailData,
+    });
+    return response.data.data.message;
+  }
+
+  // Email response endpoint
+  async sendEmailResponse(conversationId: string, emailResponse: string, targetPlatform?: string, mediaUrls?: string[]) {
+    const response = await this.client.post('/messages/email-response', {
+      conversationId,
+      emailResponse,
+      targetPlatform,
       mediaUrls,
     });
     return response.data.data.message;

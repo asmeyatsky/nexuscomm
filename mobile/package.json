@@ -36,7 +36,8 @@
     "react-native-fs": "^2.20.0",
     "react-native-uuid": "^2.0.1",
     "@react-native-camera-roll/camera-roll": "^7.5.0",
-    "react-native-webview": "^13.8.4"
+    "react-native-webview": "^13.8.4",
+    "@react-native-voice/voice": "^3.2.4"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
