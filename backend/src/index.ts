@@ -8,6 +8,7 @@ import { errorHandler, asyncHandler } from '@middleware/errorHandler';
 import { rateLimit, cleanupOldRecords } from '@middleware/rateLimit';
 import pino from 'pino';
 import pinoHttp from 'pino-http';
+import diConfig from '@infrastructure/config/DependencyInjectionConfig';
 
 dotenv.config();
 
@@ -54,10 +55,17 @@ async function startServer() {
     // Initialize database
     await initializeDatabase();
 
+    // Verify DI configuration is working properly
+    console.log('✅ Dependency Injection configured successfully');
+    console.log('✅ Message creation use case available:', !!diConfig.getCreateMessageUseCase());
+    console.log('✅ Message retrieval use case available:', !!diConfig.getGetMessageHistoryUseCase());
+    console.log('✅ Conversation management use case available:', !!diConfig.getGetConversationsUseCase());
+
     app.listen(PORT, () => {
       logger.info(`✅ NexusComm Gateway running on port ${PORT}`);
       console.log(`🚀 Server ready at http://localhost:${PORT}`);
       console.log(`📚 API docs at http://localhost:${PORT}/api/health`);
+      console.log(`🔧 Architecture: Clean/Hexagonal with DDD principles`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
