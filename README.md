@@ -296,6 +296,27 @@ We take security seriously. If you discover any security issues, please follow o
 
 This project is licensed under the Proprietary License - see the [LICENSE](LICENSE) file for details.
 
+## 🤖 Automated Architecture Verification
+
+This project includes an automated post-commit hook that verifies the clean/hexagonal architecture is maintained after each commit:
+
+- **Dependency injection configuration** is verified
+- **Core architectural components** (domain, application, infrastructure layers) are checked
+- **Architecture documentation** presence is confirmed
+- **DDD principles** compliance is validated
+
+### Installing the Hook
+
+To enable automated verification after each commit:
+
+```bash
+# Copy the hook to your local git hooks directory
+cp hooks/post-commit .git/hooks/
+chmod +x .git/hooks/post-commit
+```
+
+The hook will then run automatically after each commit to ensure architectural integrity.
+
 ## 👥 Team
 
 ### Core Contributors

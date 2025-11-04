@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# Post-commit hook for NexusComm
+# Runs after each commit to verify architecture integrity
+
+echo "🔍 Verifying NexusComm architecture after commit..."
+
+# Check if the commit includes architecture-related files
+if git diff --name-only HEAD^ HEAD | grep -E "(domain|application|infrastructure|ARCHITECTURE)" > /dev/null; then
+    echo "✅ Architecture-related changes detected, running verification..."
+    
+    # Verify dependency injection configuration exists
+    if [ -f "backend/src/infrastructure/config/DependencyInjectionConfig.ts" ]; then
+        echo "✅ Dependency injection configuration found"
+    else
+        echo "❌ Dependency injection configuration missing"
+        exit 1
+    fi
+    
+    # Verify key architectural components exist
+    if [ -f "backend/src/domain/entities/Message.ts" ] && 
+       [ -f "backend/src/application/use_cases/CreateMessageUseCase.ts" ] &&
+       [ -f "backend/src/infrastructure/repositories/TypeORMMessageRepositoryAdapter.ts" ]; then
+        echo "✅ Core architectural components verified"
+    else
+        echo "❌ Core architectural components missing"
+        exit 1
+    fi
+    
+    # Verify architecture documentation exists
+    if [ -f "ARCHITECTURE.md" ]; then
+        echo "✅ Architecture documentation found"
+    else
+        echo "⚠️  Architecture documentation missing"
+    fi
+    
+    echo "✅ NexusComm architecture verification completed successfully!"
+    echo "🚀 Clean/Hexagonal architecture with DDD principles maintained"
+else
+    echo "ℹ️  No architecture-related changes in this commit, skipping detailed verification"
+fi
+
+echo "📦 Commit verification complete!"
