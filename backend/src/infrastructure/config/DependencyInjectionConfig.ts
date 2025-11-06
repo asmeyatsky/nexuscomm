@@ -33,6 +33,11 @@ import { GenerateReplySuggestionsUseCase } from '@application/use_cases/Generate
 import { SemanticSearchUseCase } from '@application/use_cases/SemanticSearchUseCase';
 import { ClaudeAIServiceAdapter } from '@infrastructure/adapters/ClaudeAIServiceAdapter';
 import { AIAnalysisPort } from '@domain/ports/AIAnalysisPort';
+import { SummarizeConversationUseCase } from '@application/use_cases/SummarizeConversationUseCase';
+import { GetSmartScheduleRecommendationUseCase } from '@application/use_cases/GetSmartScheduleRecommendationUseCase';
+import { GetConversationInsightsUseCase as AnalysisInsightsUseCase } from '@application/use_cases/GetConversationInsightsUseCase';
+import { ClaudeAdvancedAIAdapter } from '@infrastructure/adapters/ClaudeAdvancedAIAdapter';
+import { AIAdvancedPort } from '@domain/ports/AIAdvancedPort';
 
 /**
  * DependencyInjectionConfig
@@ -91,6 +96,12 @@ export class DependencyInjectionConfig {
   private generateReplySuggestionsUseCase: GenerateReplySuggestionsUseCase;
   private semanticSearchUseCase: SemanticSearchUseCase;
 
+  // Advanced AI services
+  private aiAdvancedPort: AIAdvancedPort;
+  private summarizeConversationUseCase: SummarizeConversationUseCase;
+  private getSmartScheduleRecommendationUseCase: GetSmartScheduleRecommendationUseCase;
+  private getConversationAnalysisInsightsUseCase: AnalysisInsightsUseCase;
+
   constructor() {
     // Initialize infrastructure layer (repositories)
     const messageRepository = new TypeORMMessageRepositoryAdapter(AppDataSource);
@@ -141,6 +152,16 @@ export class DependencyInjectionConfig {
     this.categorizeMessageUseCase = new CategorizeMessageUseCase(this.aiAnalysisPort);
     this.generateReplySuggestionsUseCase = new GenerateReplySuggestionsUseCase(this.aiAnalysisPort);
     this.semanticSearchUseCase = new SemanticSearchUseCase(this.aiAnalysisPort);
+
+    // Initialize advanced AI services
+    this.aiAdvancedPort = new ClaudeAdvancedAIAdapter(process.env.ANTHROPIC_API_KEY);
+    this.summarizeConversationUseCase = new SummarizeConversationUseCase(this.aiAdvancedPort);
+    this.getSmartScheduleRecommendationUseCase = new GetSmartScheduleRecommendationUseCase(
+      this.aiAdvancedPort,
+    );
+    this.getConversationAnalysisInsightsUseCase = new AnalysisInsightsUseCase(
+      this.aiAdvancedPort,
+    );
   }
 
   // Message use cases
@@ -273,6 +294,23 @@ export class DependencyInjectionConfig {
 
   public getSemanticSearchUseCase(): SemanticSearchUseCase {
     return this.semanticSearchUseCase;
+  }
+
+  // Advanced AI analysis use cases
+  public getAIAdvancedPort(): AIAdvancedPort {
+    return this.aiAdvancedPort;
+  }
+
+  public getSummarizeConversationUseCase(): SummarizeConversationUseCase {
+    return this.summarizeConversationUseCase;
+  }
+
+  public getSmartScheduleRecommendationUseCase(): GetSmartScheduleRecommendationUseCase {
+    return this.getSmartScheduleRecommendationUseCase;
+  }
+
+  public getConversationAnalysisInsightsUseCase(): AnalysisInsightsUseCase {
+    return this.getConversationAnalysisInsightsUseCase;
   }
 }
 

@@ -24,6 +24,8 @@ import * as CrossDeviceSynchronizationController from '@controllers/CrossDeviceS
 import * as IdentityFilterController from '@controllers/IdentityFilterController';
 import * as AIAnalysisController from '@controllers/AIAnalysisController';
 import * as AIAsyncController from '@controllers/AIAsyncController';
+import { AIAdvancedController } from '@controllers/AIAdvancedController';
+import diConfig from '@config/DependencyInjectionConfig';
 
 const router = Router();
 
@@ -312,5 +314,37 @@ router.post(
 );
 router.get('/ai/jobs/:jobId', authenticateToken, AIAsyncController.getJobStatus);
 router.get('/ai/queue/stats', authenticateToken, AIAsyncController.getQueueStats);
+
+// Advanced AI Analysis routes (summarization, scheduling, insights)
+const aiAdvancedController = new AIAdvancedController(
+  diConfig.getSummarizeConversationUseCase(),
+  diConfig.getSmartScheduleRecommendationUseCase(),
+  diConfig.getConversationAnalysisInsightsUseCase(),
+);
+
+router.post(
+  '/ai/summarize',
+  authenticateToken,
+  aiRateLimit,
+  (req, res) => aiAdvancedController.summarizeConversation(req, res),
+);
+router.post(
+  '/ai/schedule-recommendation',
+  authenticateToken,
+  aiRateLimit,
+  (req, res) => aiAdvancedController.getSchedulingRecommendation(req, res),
+);
+router.get(
+  '/ai/insights/:conversationId',
+  authenticateToken,
+  aiRateLimit,
+  (req, res) => aiAdvancedController.getConversationInsights(req, res),
+);
+router.get(
+  '/ai/conversation-health/:conversationId',
+  authenticateToken,
+  aiRateLimit,
+  (req, res) => aiAdvancedController.getConversationHealth(req, res),
+);
 
 export default router;
