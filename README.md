@@ -33,11 +33,15 @@ NexusComm is a **monorepo** project consisting of:
 - Message analytics and insights
 - Real-time presence and status
 
-### AI-Powered Intelligence (powered by Claude)
-- **Sentiment Analysis**: Analyze emotional tone of messages with confidence scoring
-- **Smart Categorization**: Auto-categorize messages by type, urgency, and topic
-- **Reply Suggestions**: AI-generated reply suggestions based on conversation context
-- **Semantic Search**: Find semantically similar messages beyond keyword matching
+### AI-Powered Intelligence (Anthropic Claude)
+- **Sentiment Analysis**: Emotional tone detection with positive/neutral/negative scoring + confidence
+- **Smart Categorization**: Auto-tag by type, urgency, topic; extract themes and insights
+- **Reply Suggestions**: Context-aware replies in multiple tones (professional, casual, empathetic, humorous)
+- **Semantic Search**: Intelligent cross-message search using AI embeddings
+- **Automatic Analysis**: Messages auto-analyzed on creation (fully configurable)
+- **Async Processing**: Background job queuing with Bull + Redis for non-blocking operations
+- **Cost Tracking**: Real-time monitoring with per-user quotas, daily/monthly limits, USD tracking
+- **Usage Analytics**: Comprehensive metrics on all AI operations with success/failure tracking
 
 ### Security & Quality
 - JWT-based authentication
@@ -220,13 +224,20 @@ nexuscomm/
 - `GET /api/users/:id` - Get user profile
 - `PUT /api/users/:id` - Update user profile
 
-### AI Analysis (Claude-powered)
-- `POST /api/ai/analyze-sentiment` - Analyze message sentiment with emotional tone and confidence
-- `POST /api/ai/categorize-message` - Auto-categorize message by type, urgency, and topic
-- `POST /api/ai/reply-suggestions` - Generate smart reply suggestions based on context
-- `POST /api/ai/search` - Perform semantic search across messages
+### AI Analysis (Claude-powered, Sync)
+- `POST /api/ai/analyze-sentiment` - Analyze message sentiment (immediate response)
+- `POST /api/ai/categorize-message` - Auto-categorize message (immediate response)
+- `POST /api/ai/reply-suggestions` - Generate smart replies (immediate response)
+- `POST /api/ai/search` - Semantic search across messages
 - `GET /api/ai/health` - Check AI service availability
-- `GET /api/ai/usage` - Get AI service usage metrics and cost tracking
+- `GET /api/ai/usage` - Get current usage metrics and cost tracking
+
+### AI Analysis (Claude-powered, Async for heavy operations)
+- `POST /api/ai/analyze-sentiment/async` - Queue sentiment analysis (returns jobId)
+- `POST /api/ai/categorize-message/async` - Queue categorization (returns jobId)
+- `POST /api/ai/reply-suggestions/async` - Queue reply generation (returns jobId)
+- `GET /api/ai/jobs/:jobId` - Check async job status and progress
+- `GET /api/queue/stats` - Get background queue statistics (waiting, active, completed)
 
 For complete API documentation, see [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md).
 
@@ -298,28 +309,52 @@ kubectl apply -f k8s/
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 
+## AI & Cost Management Infrastructure
+
+### Cost Tracking & Rate Limiting
+- Per-user daily limits (1,000 requests, 100K tokens, $10/day)
+- Per-user monthly limits (20,000 requests, 1M tokens, $100/month)
+- Real-time quota enforcement with 429 responses
+- Cost estimation based on Anthropic Sonnet pricing
+- Monthly reset automatic on the 1st
+- Disable/enable AI features per user
+
+### Async Job Processing
+- Bull queue + Redis for background processing
+- Exponential backoff retry logic (3 attempts)
+- Job status polling via API
+- Queue statistics and monitoring
+- Automatic cleanup of completed jobs
+- Stalled job detection and logging
+
+### Database Storage
+- `MessageAnalysisResult` - Store sentiment, categorization, themes
+- `UserAIQuota` - Track usage, limits, and rate limiting state
+- `AIUsageLog` - Audit trail of all AI operations with metrics
+- Indexes for fast lookup by user, operation, timestamp
+
 ## Roadmap
 
-### Current (v0.1)
+### Current (v0.2 - In Progress)
 - ✅ Core messaging functionality
 - ✅ Multi-channel integrations
 - ✅ Real-time updates
 - ✅ Message search and filtering
 - ✅ Conversation management
-- ✅ Claude AI-powered intelligence
-  - ✅ Sentiment analysis with confidence scoring
-  - ✅ Smart message categorization
-  - ✅ AI reply suggestions
-  - ✅ Semantic search capabilities
+- ✅ Claude AI-powered intelligence (4 features)
+- ✅ Async job processing with Bull
+- ✅ Cost monitoring and rate limiting
+- ✅ Database persistence for analysis results
+- ✅ Automatic message analysis on creation
 
-### Planned (v0.2)
-- Vector database integration for semantic search
-- Message scheduling and smart timing
-- Advanced conversation analytics
+### Planned (v0.3)
+- Vector database integration (Pinecone/Weaviate) for semantic search
+- Message scheduling with AI optimal timing
+- Advanced conversation analytics dashboard
 - Additional channel integrations
-- Enhanced UI/UX improvements
-- Performance optimizations
+- Frontend UI for AI insights and suggestions
 - Webhook support for external integrations
+- Conversation summarization
 
 ## Support & Documentation
 
