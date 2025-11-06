@@ -31,7 +31,8 @@
     "crypto": "^1.0.1",
     "bull": "^4.11.4",
     "redis": "^4.6.11",
-    "throttle-debounce": "^5.0.0"
+    "throttle-debounce": "^5.0.0",
+    "@anthropic-ai/sdk": "^0.24.3"
   },
   "devDependencies": {
     "@types/node": "^20.10.4",

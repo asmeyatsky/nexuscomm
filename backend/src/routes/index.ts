@@ -21,6 +21,7 @@ import * as OfflineCapabilitiesController from '@controllers/OfflineCapabilities
 import * as AdvancedSearchKnowledgeManagementController from '@controllers/AdvancedSearchKnowledgeManagementController';
 import * as CrossDeviceSynchronizationController from '@controllers/CrossDeviceSynchronizationController';
 import * as IdentityFilterController from '@controllers/IdentityFilterController';
+import * as AIAnalysisController from '@controllers/AIAnalysisController';
 
 const router = Router();
 
@@ -259,5 +260,13 @@ router.get('/filters/:filterId', authenticateToken, IdentityFilterController.get
 router.put('/filters/:filterId', authenticateToken, IdentityFilterController.updateFilter);
 router.delete('/filters/:filterId', authenticateToken, IdentityFilterController.deleteFilter);
 router.post('/filters/reorder', authenticateToken, IdentityFilterController.reorderFilters);
+
+// AI Analysis routes
+router.post('/ai/analyze-sentiment', authenticateToken, AIAnalysisController.analyzeSentiment);
+router.post('/ai/categorize-message', authenticateToken, AIAnalysisController.categorizeMessage);
+router.post('/ai/reply-suggestions', authenticateToken, AIAnalysisController.generateReplySuggestions);
+router.post('/ai/search', authenticateToken, AIAnalysisController.semanticSearch);
+router.get('/ai/health', AIAnalysisController.checkAIServiceHealth);
+router.get('/ai/usage', authenticateToken, AIAnalysisController.getAIUsageMetrics);
 
 export default router;

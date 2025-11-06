@@ -33,6 +33,12 @@ NexusComm is a **monorepo** project consisting of:
 - Message analytics and insights
 - Real-time presence and status
 
+### AI-Powered Intelligence (powered by Claude)
+- **Sentiment Analysis**: Analyze emotional tone of messages with confidence scoring
+- **Smart Categorization**: Auto-categorize messages by type, urgency, and topic
+- **Reply Suggestions**: AI-generated reply suggestions based on conversation context
+- **Semantic Search**: Find semantically similar messages beyond keyword matching
+
 ### Security & Quality
 - JWT-based authentication
 - Rate limiting and request validation
@@ -49,6 +55,7 @@ NexusComm is a **monorepo** project consisting of:
 - **Database**: PostgreSQL with TypeORM
 - **Real-time**: WebSockets with ws
 - **Caching/Jobs**: Redis with Bull
+- **AI Services**: Anthropic Claude API for sentiment analysis, categorization, suggestions
 - **Security**: JWT, Helmet, CORS, bcrypt
 - **Validation**: Joi
 - **Logging**: Pino
@@ -213,6 +220,14 @@ nexuscomm/
 - `GET /api/users/:id` - Get user profile
 - `PUT /api/users/:id` - Update user profile
 
+### AI Analysis (Claude-powered)
+- `POST /api/ai/analyze-sentiment` - Analyze message sentiment with emotional tone and confidence
+- `POST /api/ai/categorize-message` - Auto-categorize message by type, urgency, and topic
+- `POST /api/ai/reply-suggestions` - Generate smart reply suggestions based on context
+- `POST /api/ai/search` - Perform semantic search across messages
+- `GET /api/ai/health` - Check AI service availability
+- `GET /api/ai/usage` - Get AI service usage metrics and cost tracking
+
 For complete API documentation, see [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md).
 
 ## Contributing
@@ -247,7 +262,10 @@ DATABASE_URL=postgresql://user:password@localhost:5432/nexuscomm
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your_jwt_secret
 CLIENT_URL=http://localhost:3001
+ANTHROPIC_API_KEY=your_anthropic_api_key
 ```
+
+**Note**: Get your ANTHROPIC_API_KEY from the [Anthropic Console](https://console.anthropic.com)
 
 ### Web (.env.local)
 ```
@@ -288,13 +306,20 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 - ✅ Real-time updates
 - ✅ Message search and filtering
 - ✅ Conversation management
+- ✅ Claude AI-powered intelligence
+  - ✅ Sentiment analysis with confidence scoring
+  - ✅ Smart message categorization
+  - ✅ AI reply suggestions
+  - ✅ Semantic search capabilities
 
-### Planned
-- Enhanced UI/UX improvements
+### Planned (v0.2)
+- Vector database integration for semantic search
+- Message scheduling and smart timing
+- Advanced conversation analytics
 - Additional channel integrations
-- Message scheduling
-- Advanced message formatting
+- Enhanced UI/UX improvements
 - Performance optimizations
+- Webhook support for external integrations
 
 ## Support & Documentation
 

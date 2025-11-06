@@ -12,12 +12,12 @@ import { AddReactionUseCase } from './use_cases/AddReactionUseCase';
 import { GetMessageHistoryUseCase, SearchMessagesUseCase, GetMessageByIdUseCase } from './use_cases/GetMessageUseCases';
 import { MarkMessagesAsReadUseCase } from './use_cases/MarkMessagesAsReadUseCase';
 import { MarkIndividualMessageAsReadUseCase } from './use_cases/MarkIndividualMessageAsReadUseCase';
-import { 
-  SendMessageWithMentionsUseCase, 
-  SendMessageWithRichTextUseCase, 
-  GetThreadMessagesUseCase, 
-  GetMessageAnalyticsUseCase, 
-  BulkMarkMessagesUseCase 
+import {
+  SendMessageWithMentionsUseCase,
+  SendMessageWithRichTextUseCase,
+  GetThreadMessagesUseCase,
+  GetMessageAnalyticsUseCase,
+  BulkMarkMessagesUseCase
 } from './use_cases/AdvancedMessagingUseCases';
 import {
   AdvancedMessageSearchUseCase,
@@ -27,6 +27,12 @@ import {
 } from './use_cases/SearchIntelligenceUseCases';
 import { CreateConversationUseCase, AddParticipantUseCase, RemoveParticipantUseCase, ManageConversationUseCase, GetConversationsUseCase } from './use_cases/ConversationUseCases';
 import { CreateUserUseCase, UpdateUserStatusUseCase, UpdateUserOnlineStatusUseCase, UpdateUserProfileUseCase } from './use_cases/UserUseCases';
+import { AnalyzeSentimentUseCase } from '@application/use_cases/AnalyzeSentimentUseCase';
+import { CategorizeMessageUseCase } from '@application/use_cases/CategorizeMessageUseCase';
+import { GenerateReplySuggestionsUseCase } from '@application/use_cases/GenerateReplySuggestionsUseCase';
+import { SemanticSearchUseCase } from '@application/use_cases/SemanticSearchUseCase';
+import { ClaudeAIServiceAdapter } from '@infrastructure/adapters/ClaudeAIServiceAdapter';
+import { AIAnalysisPort } from '@domain/ports/AIAnalysisPort';
 
 /**
  * DependencyInjectionConfig
@@ -78,6 +84,13 @@ export class DependencyInjectionConfig {
   private updateUserOnlineStatusUseCase: UpdateUserOnlineStatusUseCase;
   private updateUserProfileUseCase: UpdateUserProfileUseCase;
 
+  // AI analysis services
+  private aiAnalysisPort: AIAnalysisPort;
+  private analyzeSentimentUseCase: AnalyzeSentimentUseCase;
+  private categorizeMessageUseCase: CategorizeMessageUseCase;
+  private generateReplySuggestionsUseCase: GenerateReplySuggestionsUseCase;
+  private semanticSearchUseCase: SemanticSearchUseCase;
+
   constructor() {
     // Initialize infrastructure layer (repositories)
     const messageRepository = new TypeORMMessageRepositoryAdapter(AppDataSource);
@@ -117,6 +130,13 @@ export class DependencyInjectionConfig {
     this.updateUserStatusUseCase = new UpdateUserStatusUseCase(this.userDomainService);
     this.updateUserOnlineStatusUseCase = new UpdateUserOnlineStatusUseCase(this.userDomainService);
     this.updateUserProfileUseCase = new UpdateUserProfileUseCase(this.userDomainService);
+
+    // Initialize AI analysis services
+    this.aiAnalysisPort = new ClaudeAIServiceAdapter();
+    this.analyzeSentimentUseCase = new AnalyzeSentimentUseCase(this.aiAnalysisPort);
+    this.categorizeMessageUseCase = new CategorizeMessageUseCase(this.aiAnalysisPort);
+    this.generateReplySuggestionsUseCase = new GenerateReplySuggestionsUseCase(this.aiAnalysisPort);
+    this.semanticSearchUseCase = new SemanticSearchUseCase(this.aiAnalysisPort);
   }
 
   // Message use cases
@@ -228,6 +248,27 @@ export class DependencyInjectionConfig {
 
   public getUpdateUserProfileUseCase(): UpdateUserProfileUseCase {
     return this.updateUserProfileUseCase;
+  }
+
+  // AI analysis use cases
+  public getAIAnalysisPort(): AIAnalysisPort {
+    return this.aiAnalysisPort;
+  }
+
+  public getAnalyzeSentimentUseCase(): AnalyzeSentimentUseCase {
+    return this.analyzeSentimentUseCase;
+  }
+
+  public getCategorizeMessageUseCase(): CategorizeMessageUseCase {
+    return this.categorizeMessageUseCase;
+  }
+
+  public getGenerateReplySuggestionsUseCase(): GenerateReplySuggestionsUseCase {
+    return this.generateReplySuggestionsUseCase;
+  }
+
+  public getSemanticSearchUseCase(): SemanticSearchUseCase {
+    return this.semanticSearchUseCase;
   }
 }
 

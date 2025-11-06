@@ -29,6 +29,14 @@ The domain layer contains the core business logic and entities of the applicatio
 - **ConversationRepositoryPort**: Defines the contract for conversation data access
 - **UserRepositoryPort**: Defines the contract for user data access
 - **ExternalMessageServicePort**: Defines the contract for external messaging services
+- **AIAnalysisPort**: Defines the contract for AI analysis services
+  - `analyzeSentiment()`: Analyze message sentiment and emotional tone
+  - `categorizeMessage()`: Categorize message by type, urgency, and topic
+  - `generateSuggestions()`: Generate context-aware reply suggestions
+  - `semanticSearch()`: Perform semantic search across messages
+  - `generateEmbedding()`: Generate vector embeddings for semantic operations
+  - `isHealthy()`: Health check for AI service availability
+  - `getUsageMetrics()`: Retrieve usage and cost metrics
 
 ### 2. Application Layer
 The application layer contains use cases that orchestrate the execution of business logic.
@@ -58,6 +66,12 @@ The application layer contains use cases that orchestrate the execution of busin
   - `GetConversationInsightsUseCase`: Provides conversation insights
   - `GetMessageTrendsUseCase`: Provides message trend analysis
 
+- **AI Analysis Use Cases** (Claude-powered):
+  - `AnalyzeSentimentUseCase`: Analyzes emotional tone and sentiment of messages
+  - `CategorizeMessageUseCase`: Auto-categorizes messages by type, urgency, and topic
+  - `GenerateReplySuggestionsUseCase`: Generates context-aware reply suggestions
+  - `SemanticSearchUseCase`: Performs semantic search using AI embeddings
+
 ### 3. Infrastructure Layer
 The infrastructure layer provides concrete implementations for the domain ports.
 
@@ -71,9 +85,17 @@ The infrastructure layer provides concrete implementations for the domain ports.
 - **EmailServiceAdapter**: Implements email service integration
 - **SMSServiceAdapter**: Implements SMS service integration
 - **MessagingAdapter**: Coordinates multiple channel adapters
+- **ClaudeAIServiceAdapter**: Implements AIAnalysisPort using Anthropic Claude API
+  - Sentiment analysis with confidence scoring
+  - Message categorization and topic extraction
+  - Reply suggestion generation
+  - Semantic search capabilities
+  - Health checking and usage metrics tracking
 
 #### Configuration
 - **DependencyInjectionConfig**: Centralizes dependency injection setup
+  - Wires all domain services, repositories, and use cases
+  - Initializes AI analysis port with Claude adapter
 
 ### 4. Presentation Layer
 The presentation layer handles HTTP requests and responses.
