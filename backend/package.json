@@ -32,7 +32,9 @@
     "bull": "^4.11.4",
     "redis": "^4.6.11",
     "throttle-debounce": "^5.0.0",
-    "@anthropic-ai/sdk": "^0.24.3"
+    "@anthropic-ai/sdk": "^0.24.3",
+    "@pinecone-database/pinecone": "^3.0.0",
+    "js-tiktoken": "^1.0.11"
   },
   "devDependencies": {
     "@types/node": "^20.10.4",

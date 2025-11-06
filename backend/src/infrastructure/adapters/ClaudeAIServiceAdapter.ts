@@ -20,6 +20,7 @@ import {
 } from '../../domain/ports/AIAnalysisPort';
 import { AIUsageLogRepository, LogAIOperationInput } from '@infrastructure/repositories/AIUsageLogRepository';
 import { AIAnalysisResultsRepository } from '@infrastructure/repositories/AIAnalysisResultsRepository';
+import { PineconeVectorStoreAdapter } from './PineconeVectorStoreAdapter';
 import pino from 'pino';
 
 export class ClaudeAIServiceAdapter implements AIAnalysisPort {
@@ -27,6 +28,7 @@ export class ClaudeAIServiceAdapter implements AIAnalysisPort {
   private logger: pino.Logger;
   private usageLogRepository: AIUsageLogRepository;
   private analysisResultsRepository: AIAnalysisResultsRepository;
+  private vectorStore: PineconeVectorStoreAdapter;
   private requestCount: number = 0;
   private tokenCount: number = 0;
   private costEstimate: number = 0;
@@ -34,13 +36,14 @@ export class ClaudeAIServiceAdapter implements AIAnalysisPort {
   private readonly MAX_RETRIES = 3;
   private readonly RATE_LIMIT_DELAY = 1000; // ms
 
-  constructor(apiKey?: string) {
+  constructor(apiKey?: string, pineconeApiKey?: string, pineconeIndex?: string) {
     this.client = new Anthropic({
       apiKey: apiKey || process.env.ANTHROPIC_API_KEY,
     });
     this.logger = pino();
     this.usageLogRepository = new AIUsageLogRepository(AppDataSource);
     this.analysisResultsRepository = new AIAnalysisResultsRepository(AppDataSource);
+    this.vectorStore = new PineconeVectorStoreAdapter(pineconeApiKey, pineconeIndex);
   }
 
   async analyzeSentiment(
@@ -116,15 +119,33 @@ export class ClaudeAIServiceAdapter implements AIAnalysisPort {
     request: SemanticSearchRequest,
   ): Promise<SemanticSearchResult[]> {
     try {
-      // For semantic search, we would typically:
-      // 1. Generate embedding for the query
-      // 2. Query vector database for similar messages
-      // For now, return empty array - implementation requires vector DB
-      this.logger.info(
-        { query: request.query },
-        'Semantic search requested - vector DB integration needed',
+      // Validate request
+      if (!request.query || request.query.trim().length === 0) {
+        throw new Error('Query is required');
+      }
+
+      if (!request.userId || request.userId.trim().length === 0) {
+        throw new Error('UserId is required');
+      }
+
+      // Perform semantic search using Pinecone
+      const results = await this.vectorStore.search(
+        request.query,
+        request.userId,
+        request.conversationIds,
+        request.limit || 10,
       );
-      return [];
+
+      this.logger.info(
+        {
+          query: request.query,
+          userId: request.userId,
+          resultCount: results.length,
+        },
+        'Semantic search completed successfully',
+      );
+
+      return results;
     } catch (error) {
       this.logger.error(
         { error, query: request.query },

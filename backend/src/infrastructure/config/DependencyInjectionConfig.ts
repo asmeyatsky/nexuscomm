@@ -132,7 +132,11 @@ export class DependencyInjectionConfig {
     this.updateUserProfileUseCase = new UpdateUserProfileUseCase(this.userDomainService);
 
     // Initialize AI analysis services
-    this.aiAnalysisPort = new ClaudeAIServiceAdapter();
+    this.aiAnalysisPort = new ClaudeAIServiceAdapter(
+      process.env.ANTHROPIC_API_KEY,
+      process.env.PINECONE_API_KEY,
+      process.env.PINECONE_INDEX || 'nexuscomm-messages',
+    );
     this.analyzeSentimentUseCase = new AnalyzeSentimentUseCase(this.aiAnalysisPort);
     this.categorizeMessageUseCase = new CategorizeMessageUseCase(this.aiAnalysisPort);
     this.generateReplySuggestionsUseCase = new GenerateReplySuggestionsUseCase(this.aiAnalysisPort);

@@ -22,7 +22,7 @@
     "date-fns": "^2.30.0",
     "react-hot-toast": "^2.4.1",
     "react-query": "^3.39.3",
-    "headlessui": "^1.7.17",
+    "@headlessui/react": "^1.7.17",
     "heroicons": "^2.0.18",
     "quill": "^2.0.0",
     "react-quill": "^2.0.0",
