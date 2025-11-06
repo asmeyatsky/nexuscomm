@@ -5,6 +5,7 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
+import { AppDataSource } from '@config/database';
 import { MessageAnalysis, SentimentScore, MessageCategory, MessageTheme } from '../../domain/valueObjects/MessageAnalysis';
 import { MessageSuggestion, SuggestedReply } from '../../domain/valueObjects/MessageSuggestion';
 import {
@@ -17,11 +18,15 @@ import {
   EmbeddingRequest,
   SemanticSearchResult,
 } from '../../domain/ports/AIAnalysisPort';
+import { AIUsageLogRepository, LogAIOperationInput } from '@infrastructure/repositories/AIUsageLogRepository';
+import { AIAnalysisResultsRepository } from '@infrastructure/repositories/AIAnalysisResultsRepository';
 import pino from 'pino';
 
 export class ClaudeAIServiceAdapter implements AIAnalysisPort {
   private client: Anthropic;
   private logger: pino.Logger;
+  private usageLogRepository: AIUsageLogRepository;
+  private analysisResultsRepository: AIAnalysisResultsRepository;
   private requestCount: number = 0;
   private tokenCount: number = 0;
   private costEstimate: number = 0;
@@ -34,6 +39,8 @@ export class ClaudeAIServiceAdapter implements AIAnalysisPort {
       apiKey: apiKey || process.env.ANTHROPIC_API_KEY,
     });
     this.logger = pino();
+    this.usageLogRepository = new AIUsageLogRepository(AppDataSource);
+    this.analysisResultsRepository = new AIAnalysisResultsRepository(AppDataSource);
   }
 
   async analyzeSentiment(
@@ -371,5 +378,67 @@ Respond with exactly this JSON structure:
     this.tokenCount += estimatedTokens;
     // Sonnet pricing: $3/1M input, $15/1M output tokens
     this.costEstimate += (estimatedTokens * 15) / 1000000;
+  }
+
+  /**
+   * Log AI operation to database for audit and cost tracking
+   */
+  private async logAIOperation(
+    userId: string,
+    operation: string,
+    status: 'success' | 'failure' | 'rate_limited',
+    inputTokens: number,
+    outputTokens: number,
+    responseTimeMs: number,
+    error?: Error,
+    metadata?: Record<string, any>,
+  ): Promise<void> {
+    try {
+      const totalTokens = inputTokens + outputTokens;
+      const estimatedCost = (totalTokens * 15) / 1000000; // Sonnet pricing
+
+      const logInput: LogAIOperationInput = {
+        userId,
+        operation: operation as any,
+        model: this.MODEL,
+        status,
+        inputTokens,
+        outputTokens,
+        totalTokens,
+        estimatedCost,
+        requestSize: 0, // Can be calculated from prompt
+        responseSize: 0, // Can be calculated from response
+        responseTimeMs,
+        errorCode: error?.name,
+        errorMessage: error?.message,
+        metadata: metadata || {},
+      };
+
+      await this.usageLogRepository.logOperation(logInput);
+    } catch (err) {
+      this.logger.error(
+        { error: err, userId, operation },
+        'Failed to log AI operation',
+      );
+    }
+  }
+
+  /**
+   * Save analysis results to database
+   */
+  private async saveAnalysisResults(
+    messageId: string,
+    userId: string,
+    analysis: MessageAnalysis,
+  ): Promise<void> {
+    try {
+      await this.analysisResultsRepository.saveAnalysis(messageId, userId, analysis);
+    } catch (error) {
+      this.logger.error(
+        { error, messageId, userId },
+        'Failed to save analysis results',
+      );
+      // Don't throw - analysis is still valid even if storage fails
+    }
   }
 }

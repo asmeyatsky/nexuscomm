@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '@middleware/auth';
+import { aiRateLimit } from '@middleware/aiRateLimit';
 import * as AuthController from '@controllers/AuthController';
 import * as AccountController from '@controllers/AccountController';
 import * as ConversationController from '@controllers/ConversationController';
@@ -261,11 +262,31 @@ router.put('/filters/:filterId', authenticateToken, IdentityFilterController.upd
 router.delete('/filters/:filterId', authenticateToken, IdentityFilterController.deleteFilter);
 router.post('/filters/reorder', authenticateToken, IdentityFilterController.reorderFilters);
 
-// AI Analysis routes
-router.post('/ai/analyze-sentiment', authenticateToken, AIAnalysisController.analyzeSentiment);
-router.post('/ai/categorize-message', authenticateToken, AIAnalysisController.categorizeMessage);
-router.post('/ai/reply-suggestions', authenticateToken, AIAnalysisController.generateReplySuggestions);
-router.post('/ai/search', authenticateToken, AIAnalysisController.semanticSearch);
+// AI Analysis routes (with rate limiting)
+router.post(
+  '/ai/analyze-sentiment',
+  authenticateToken,
+  aiRateLimit,
+  AIAnalysisController.analyzeSentiment,
+);
+router.post(
+  '/ai/categorize-message',
+  authenticateToken,
+  aiRateLimit,
+  AIAnalysisController.categorizeMessage,
+);
+router.post(
+  '/ai/reply-suggestions',
+  authenticateToken,
+  aiRateLimit,
+  AIAnalysisController.generateReplySuggestions,
+);
+router.post(
+  '/ai/search',
+  authenticateToken,
+  aiRateLimit,
+  AIAnalysisController.semanticSearch,
+);
 router.get('/ai/health', AIAnalysisController.checkAIServiceHealth);
 router.get('/ai/usage', authenticateToken, AIAnalysisController.getAIUsageMetrics);
 

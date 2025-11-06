@@ -5,12 +5,14 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  OneToOne,
   Index,
 } from 'typeorm';
 import { Account } from './Account';
 import { Conversation } from './Conversation';
 import { Message } from './Message';
 import { IdentityFilter } from './IdentityFilter';
+import { UserAIQuota } from './UserAIQuota';
 
 @Entity('users')
 @Index(['email'], { unique: true })
@@ -70,4 +72,7 @@ export class User {
 
   @OneToMany(() => IdentityFilter, (filter) => filter.user, { cascade: true })
   identityFilters: IdentityFilter[];
+
+  @OneToOne(() => UserAIQuota, (quota) => quota.user, { cascade: true })
+  aiQuota: UserAIQuota;
 }
