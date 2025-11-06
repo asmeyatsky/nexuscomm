@@ -23,6 +23,7 @@ import * as AdvancedSearchKnowledgeManagementController from '@controllers/Advan
 import * as CrossDeviceSynchronizationController from '@controllers/CrossDeviceSynchronizationController';
 import * as IdentityFilterController from '@controllers/IdentityFilterController';
 import * as AIAnalysisController from '@controllers/AIAnalysisController';
+import * as AIAsyncController from '@controllers/AIAsyncController';
 
 const router = Router();
 
@@ -289,5 +290,27 @@ router.post(
 );
 router.get('/ai/health', AIAnalysisController.checkAIServiceHealth);
 router.get('/ai/usage', authenticateToken, AIAnalysisController.getAIUsageMetrics);
+
+// Async AI Analysis routes (for long-running operations)
+router.post(
+  '/ai/analyze-sentiment/async',
+  authenticateToken,
+  aiRateLimit,
+  AIAsyncController.analyzeSentimentAsync,
+);
+router.post(
+  '/ai/categorize-message/async',
+  authenticateToken,
+  aiRateLimit,
+  AIAsyncController.categorizeMessageAsync,
+);
+router.post(
+  '/ai/reply-suggestions/async',
+  authenticateToken,
+  aiRateLimit,
+  AIAsyncController.generateReplySuggestionsAsync,
+);
+router.get('/ai/jobs/:jobId', authenticateToken, AIAsyncController.getJobStatus);
+router.get('/ai/queue/stats', authenticateToken, AIAsyncController.getQueueStats);
 
 export default router;
