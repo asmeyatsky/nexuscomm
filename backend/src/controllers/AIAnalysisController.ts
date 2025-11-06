@@ -6,6 +6,7 @@
 
 import { Request, Response } from 'express';
 import { asyncHandler } from '@middleware/errorHandler';
+import { recordAIUsage, getAIUsageStats } from '@middleware/aiRateLimit';
 import diConfig from '@infrastructure/config/DependencyInjectionConfig';
 import {
   AnalyzeSentimentInput,
