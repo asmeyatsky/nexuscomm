@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nexuscomm-config
+  namespace: nexuscomm
+data:
+  # Database Configuration
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_NAME: nexuscomm_db
+
+  # Redis Configuration
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+
+  # API Configuration
+  NODE_ENV: production
+  PORT: "3000"
+  LOG_LEVEL: info
+  API_URL: https://api.nexuscomm.example.com
+  CLIENT_URL: https://nexuscomm.example.com
+  NEXT_PUBLIC_API_URL: https://api.nexuscomm.example.com
+
+  # JWT Configuration
+  JWT_EXPIRY: 7d
+
+  # AI Services
+  PINECONE_INDEX: nexuscomm-messages
+
+  # Feature Flags
+  ENABLE_AI_FEATURES: "true"
+  ENABLE_VECTOR_SEARCH: "true"
+  ENABLE_ASYNC_PROCESSING: "true"

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexuscomm-backend
+  namespace: nexuscomm
+  labels:
+    app: nexuscomm-backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: nexuscomm-backend
+  sessionAffinity: None
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nexuscomm-backend
+  namespace: nexuscomm

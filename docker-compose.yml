@@ -3,39 +3,48 @@ version: '3.8'
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: nexuscomm_postgres
     environment:
-      POSTGRES_USER: nexuscomm
-      POSTGRES_PASSWORD: nexuscomm_dev_password
-      POSTGRES_DB: nexuscomm_db
+      POSTGRES_USER: ${DB_USER:-nexuscomm}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-nexuscomm_dev_password}
+      POSTGRES_DB: ${DB_NAME:-nexuscomm_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nexuscomm"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-nexuscomm}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - nexuscomm-network
+    restart: unless-stopped
 
   # Redis Cache
   redis:
     image: redis:7-alpine
     container_name: nexuscomm_redis
-    ports:
-      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
     volumes:
       - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - nexuscomm-network
+    restart: unless-stopped
 
   # Backend API
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: nexuscomm_backend
     depends_on:
       postgres:
@@ -43,24 +52,66 @@ services:
       redis:
         condition: service_healthy
     environment:
-      NODE_ENV: development
+      NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
+      API_URL: ${API_URL:-http://localhost:3000}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:3001}
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_USER: nexuscomm
-      DB_PASSWORD: nexuscomm_dev_password
-      DB_NAME: nexuscomm_db
+      DB_USER: ${DB_USER:-nexuscomm}
+      DB_PASSWORD: ${DB_PASSWORD:-nexuscomm_dev_password}
+      DB_NAME: ${DB_NAME:-nexuscomm_db}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      JWT_SECRET: dev_jwt_secret_key_change_in_production
-      ENCRYPTION_SECRET: dev_encryption_secret_key_32_characters_long
-      CLIENT_URL: http://localhost:3001
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_password}
+      JWT_SECRET: ${JWT_SECRET:-dev_jwt_secret_key_change_in_production}
+      JWT_EXPIRY: ${JWT_EXPIRY:-7d}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-dev_refresh_token_secret}
+      ENCRYPTION_SECRET: ${ENCRYPTION_SECRET:-dev_encryption_secret_key_32_characters_long}
+      ENCRYPTION_IV: ${ENCRYPTION_IV:-dev_iv_16_chars}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      PINECONE_API_KEY: ${PINECONE_API_KEY:-}
+      PINECONE_INDEX: ${PINECONE_INDEX:-nexuscomm-messages}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
     ports:
-      - "3000:3000"
-    volumes:
-      - ./backend/src:/app/src
-    command: npm run dev
+      - "${BACKEND_PORT:-3000}:3000"
+    networks:
+      - nexuscomm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # Frontend Web App
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: nexuscomm_frontend
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+    ports:
+      - "${FRONTEND_PORT:-3001}:3001"
+    depends_on:
+      - backend
+    networks:
+      - nexuscomm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+networks:
+  nexuscomm-network:
+    driver: bridge
 
 volumes:
   postgres_data:
+    driver: local
   redis_data:
+    driver: local
