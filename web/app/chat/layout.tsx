@@ -1,5 +1,5 @@
-import { Sidebar } from '@/components/sidebar';
-import { TopBar } from '@/components/top-bar';
+import Sidebar from '@/components/sidebar';
+import TopBar from '@/components/top-bar';
 
 export default function ChatLayout({
   children,

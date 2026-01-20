@@ -26,7 +26,7 @@ export default function LoginPage() {
 
       const { user, accessToken, refreshToken } = response.data.data;
 
-      setTokens(accessToken, refreshToken);
+      setTokens(accessToken);
       setUser(user);
 
       toast.success('Login successful!');

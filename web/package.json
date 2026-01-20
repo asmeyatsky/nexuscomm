@@ -26,12 +26,11 @@
     "heroicons": "^2.0.18",
     "quill": "^2.0.0",
     "react-quill": "^2.0.0",
-    "react-virtual": "^3.5.0",
+    "react-window": "^1.8.10",
     "framer-motion": "^10.16.16",
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.0",
-    "clsx": "^2.0.0",
-    "zustand-persist": "^1.1.0"
+    "clsx": "^2.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",

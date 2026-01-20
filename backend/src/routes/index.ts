@@ -25,7 +25,7 @@ import * as IdentityFilterController from '@controllers/IdentityFilterController
 import * as AIAnalysisController from '@controllers/AIAnalysisController';
 import * as AIAsyncController from '@controllers/AIAsyncController';
 import { AIAdvancedController } from '@controllers/AIAdvancedController';
-import diConfig from '@config/DependencyInjectionConfig';
+import diConfig from '@infrastructure/config/DependencyInjectionConfig';
 
 const router = Router();
 

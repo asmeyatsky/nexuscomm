@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ConversationList } from '@/components/conversation-list';
-import { MessageArea } from '@/components/message-area';
+import ConversationList from '@/components/conversation-list';
+import MessageArea from '@/components/message-area';
 import { useConversationStore } from '@/lib/store';
 import { initSocket } from '@/lib/socket';
 
