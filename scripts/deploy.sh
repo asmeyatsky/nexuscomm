@@ -3,7 +3,7 @@ set -e
 
 # Configuration
 PROJECT_ID="${PROJECT_ID:-nexuscomm-487512}"
-REGION="${REGION:-us-central1}"
+REGION="${REGION:-europe-west2}"  # London, UK
 IMAGE_TAG="${IMAGE_TAG:-v1.0.0}"
 
 echo "=== NexusComm Deployment ==="

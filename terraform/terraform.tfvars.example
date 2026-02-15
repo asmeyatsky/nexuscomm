@@ -2,7 +2,7 @@
 # Copy this to terraform/terraform.tfvars and fill in your values
 
 project_id    = "nexuscomm-487512"
-region        = "us-central1"
+region        = "europe-west2"  # London, UK
 environment   = "staging"
 image_tag     = "v1.0.0"
 
