@@ -39,3 +39,9 @@ dist/
 __pycache__/
 *.egg-info/
 .pytest_cache/
+
+# Terraform
+*.tfvars
+*.tfstate
+*.tfstate.backup
+.terraform/

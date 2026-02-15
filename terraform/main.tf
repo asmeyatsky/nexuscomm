@@ -48,7 +48,7 @@ resource "google_cloud_run_v2_service" "backend" {
       }
       env {
         name  = "CLIENT_URL"
-        value = "https://nexuscomm-frontend-${var.region}.a.run.app"
+        value = "https://nexuscomm-frontend-*.a.run.app"
       }
 
       resources {
@@ -73,8 +73,8 @@ resource "google_cloud_run_v2_service" "frontend" {
       image = "${var.region}-docker.pkg.dev/${var.project_id}/nexuscomm/frontend:${var.image_tag}"
 
       env {
-        name  = "NEXT_PUBLIC_API_URL"
-        value = "https://nexuscomm-backend-${var.region}.a.run.app/api"
+        name  = "API_URL"
+        value = google_cloud_run_v2_service.backend.uri
       }
 
       resources {

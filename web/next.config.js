@@ -1,18 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   images: {
-    domains: ['nexuscomm-media.s3.amazonaws.com', 'cdn.nexuscomm.io'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'nexuscomm-media.s3.amazonaws.com' },
+      { protocol: 'https', hostname: 'cdn.nexuscomm.io' },
+    ],
     formats: ['image/avif', 'image/webp'],
   },
   compress: true,
   poweredByHeader: false,
   generateEtags: true,
   pageExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
   typescript: {
     tsconfigPath: './tsconfig.json',
   },
@@ -37,18 +36,6 @@ const nextConfig = {
         ],
       },
     ];
-  },
-  rewrites: async () => {
-    return {
-      beforeFiles: [],
-      afterFiles: [],
-      fallback: [
-        {
-          source: '/api/:path*',
-          destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`,
-        },
-      ],
-    };
   },
 };
 

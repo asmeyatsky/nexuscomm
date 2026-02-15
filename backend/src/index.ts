@@ -24,7 +24,16 @@ const httpLogger = pinoHttp({ logger });
 app.use(httpLogger);
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3001',
+  origin: (origin, callback) => {
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:3001';
+    // Support wildcard patterns for Cloud Run URLs
+    if (!origin || clientUrl.includes('*')) {
+      const pattern = new RegExp('^' + clientUrl.replace(/\*/g, '.*') + '$');
+      callback(null, !origin || pattern.test(origin));
+    } else {
+      callback(null, origin === clientUrl);
+    }
+  },
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
