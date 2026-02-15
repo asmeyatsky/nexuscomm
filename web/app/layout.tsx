@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Single-pane-of-glass communication platform',
   viewport: 'width=device-width, initial-scale=1',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/icon.svg',
   },
 };
 
