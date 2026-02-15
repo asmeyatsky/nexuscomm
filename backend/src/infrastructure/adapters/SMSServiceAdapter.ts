@@ -1,4 +1,4 @@
-import { SMSServiceAdapterPort } from '../ports/ExternalServicePorts';
+import { SMSServiceAdapterPort } from '../../domain/ports/ExternalServicePorts';
 import { Message } from '../../domain/entities/Message';
 import { User } from '../../domain/valueObjects/User';
 import { Conversation } from '../../domain/valueObjects/Conversation';

@@ -443,7 +443,7 @@ export class AccessibilityEnhancementService {
   async getAccessibleUIConfiguration(userId: string): Promise<{
     fontSize: number;
     contrastLevel: 'normal' | 'high' | 'maximum';
-    colorScheme: 'light' | 'dark' | 'custom';
+    colorScheme: 'light' | 'dark' | 'high_contrast' | 'custom';
     animationReduction: boolean;
     focusIndicator: boolean;
     touchTargetSize: 'normal' | 'large';

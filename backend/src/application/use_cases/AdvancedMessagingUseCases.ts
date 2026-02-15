@@ -211,11 +211,13 @@ export class GetThreadMessagesUseCase implements UseCase<GetThreadMessagesDTO, a
       throw new Error('Access denied or message not found');
     }
 
-    // Get all messages that have this parent as their parentId
-    // This would require a new method in the repository
-    const replies = await this.messageDomainService['messageRepository'].findBy({
-      parentId: input.parentMessageId
-    }) as any as Message[]; // This would need to be implemented properly
+    // Get all messages in the parent's conversation, then filter by parentId
+    const conversationMessages = await this.messageDomainService['messageRepository'].findByConversationId(
+      parentMessage.conversationId
+    );
+    const replies = conversationMessages.filter(
+      (msg: Message) => msg.parentId === input.parentMessageId
+    );
 
     return {
       parentMessageId: input.parentMessageId,
@@ -255,15 +257,14 @@ export class GetMessageAnalyticsUseCase implements UseCase<GetMessageAnalyticsDT
       throw new Error('Access denied');
     }
 
-    // Get messages in the specified date range
-    // This would need a new repository method
-    const messages = await this.messageDomainService['messageRepository'].findBy({
-      conversationId: input.conversationId,
-      createdAt: {
-        $gte: input.dateRange.start,
-        $lte: input.dateRange.end,
-      }
-    }) as any as Message[]; // This would need to be implemented properly
+    // Get messages in the specified date range using existing repository method
+    const messages = await this.messageDomainService['messageRepository'].findByConversationId(
+      input.conversationId,
+      undefined, // limit - fetch all
+      undefined, // offset
+      undefined, // beforeDate
+      input.dateRange.start // afterDate
+    ) as Message[];
 
     // Calculate analytics
     const analytics = {

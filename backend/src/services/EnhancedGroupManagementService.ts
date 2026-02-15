@@ -154,15 +154,12 @@ export class EnhancedGroupManagementService {
    */
   private async createGroupConversation(group: Group): Promise<void> {
     const conversation = this.conversationRepository.create({
-      id: `conv-${group.id}`,
       userId: group.userId,
       participantIds: group.participantIds,
       participantNames: group.participantDetails?.map(p => p.name) || [],
       participantAvatars: group.participantDetails?.map(p => p.avatar || '') || [],
       channels: group.channelTypes as any, // Assuming channelTypes match conversation channel types
-      isGroup: true, // Assuming there's a group field in conversation model
-      createdAt: new Date(),
-      updatedAt: new Date()
+      metadata: { isGroup: true, groupId: group.id },
     });
 
     await this.conversationRepository.save(conversation);
@@ -252,7 +249,7 @@ export class EnhancedGroupManagementService {
     }
 
     // Update group with new member
-    const updatedGroup = {
+    const updatedGroup: Group = {
       ...group,
       participantIds: [...group.participantIds, targetUserId],
       participantDetails: [
@@ -261,7 +258,7 @@ export class EnhancedGroupManagementService {
           id: targetUserId,
           name: targetUser.displayName || targetUser.username,
           avatar: targetUser.profilePicture,
-          role: 'member',
+          role: 'member' as const,
           joinedAt: new Date()
         }
       ],
@@ -419,6 +416,7 @@ export class EnhancedGroupManagementService {
         senderName: 'User',
         content: 'Hello everyone!',
         channelType: 'whatsapp',
+        isPinned: false,
         createdAt: new Date(),
         updatedAt: new Date(),
         reactions: [],

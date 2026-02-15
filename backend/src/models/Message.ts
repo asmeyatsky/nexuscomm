@@ -4,12 +4,14 @@ import {
   Column,
   CreateDateColumn,
   ManyToOne,
+  OneToMany,
   Index,
   JoinColumn,
 } from 'typeorm';
 import { User } from './User';
 import { Conversation } from './Conversation';
 import { Account } from './Account';
+import { Reaction } from './Reaction';
 
 @Entity('messages')
 @Index(['conversationId', 'createdAt'])
@@ -88,4 +90,7 @@ export class Message {
   @ManyToOne(() => Account, (account) => account.sentMessages, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'senderAccountId' })
   senderAccount: Account;
+
+  @OneToMany(() => Reaction, (reaction) => reaction.message, { cascade: true })
+  reactions: Reaction[];
 }

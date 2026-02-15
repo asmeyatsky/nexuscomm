@@ -22,6 +22,8 @@ export interface UserProps {
   lastSeen?: Date;
   status?: string;
   statusEmoji?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class User {
@@ -34,6 +36,8 @@ export class User {
   public readonly lastSeen?: Date;
   public readonly status?: string;
   public readonly statusEmoji?: string;
+  public readonly createdAt: Date;
+  public readonly updatedAt: Date;
 
   constructor(props: UserProps) {
     this.id = this.validateId(props.id);
@@ -45,6 +49,8 @@ export class User {
     this.lastSeen = props.lastSeen;
     this.status = props.status;
     this.statusEmoji = props.statusEmoji;
+    this.createdAt = props.createdAt || new Date();
+    this.updatedAt = props.updatedAt || new Date();
   }
 
   private validateId(id: string): string {

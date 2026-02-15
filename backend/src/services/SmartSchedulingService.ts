@@ -74,7 +74,7 @@ export class SmartSchedulingService {
     }
   ): Promise<ScheduledMessage> {
     // Verify conversation belongs to user
-    const conversation = await this.conversationService.getConversation(conversationId, userId);
+    const conversation = await this.conversationService.getConversationById(conversationId, userId);
     if (!conversation) {
       throw new AppError(404, 'Conversation not found', 'CONVERSATION_NOT_FOUND');
     }

@@ -20,6 +20,7 @@ export interface SearchOptions {
   filter?: {
     channelId?: string;
     userId?: string;
+    conversationId?: string;
     dateRange?: { from: Date; to: Date };
     type?: string;
   };

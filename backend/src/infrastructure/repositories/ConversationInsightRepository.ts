@@ -32,10 +32,21 @@ export class ConversationInsightRepository {
       sentimentScore: insight.sentimentScore,
       healthScore: insight.conversationHealth.score,
       healthStatus: insight.conversationHealth.status,
-      healthReasons: insight.conversationHealth.reasonsForScore as any,
-      recommendations: insight.conversationHealth.recommendations as any,
-      topTopics: JSON.stringify(insight.topTopics),
-      participantStats: JSON.stringify(insight.participantStats),
+      healthReasons: insight.conversationHealth.reasonsForScore,
+      recommendations: insight.conversationHealth.recommendations,
+      topTopics: insight.topTopics.map(t => ({
+        topic: t.topic,
+        messageCount: t.messageCount,
+        percentage: t.percentage,
+        sentiment: t.sentiment,
+      })),
+      participantStats: insight.participantStats.map(p => ({
+        userId: p.userId,
+        messageCount: p.messageCount,
+        averageMessageLength: p.averageMessageLength,
+        responseTimeMs: p.responseTimeMs,
+        engagementLevel: p.engagementLevel,
+      })),
       engagementTrend:
         insight.engagementTrends.length > 0 ? insight.engagementTrends[0].trend : 'stable',
       trendPercent:

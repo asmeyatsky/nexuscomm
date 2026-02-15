@@ -1,19 +1,45 @@
-import { Server as HTTPServer } from 'http';
-import { Server as SocketIOServer, Socket } from 'socket.io';
 import { verifyAccessToken } from './jwt';
 
-interface AuthenticatedSocket extends Socket {
+/**
+ * Minimal Socket interface for WebSocket connections.
+ * Defines the contract needed for socket.io-compatible socket objects
+ * without requiring the socket.io package as a dependency.
+ */
+export interface Socket {
+  handshake: {
+    auth: Record<string, string>;
+    headers: Record<string, string>;
+    query: Record<string, string>;
+  };
+  join(room: string): void;
+  leave(room: string): void;
+  on(event: string, callback: (...args: any[]) => void): void;
+  emit(event: string, ...args: any[]): void;
+}
+
+/**
+ * Minimal Server interface for a socket.io-compatible server.
+ * Provides the subset of socket.io Server methods used in this module.
+ */
+export interface SocketIOServer {
+  use(fn: (socket: Socket, next: (err?: Error) => void) => void): void;
+  on(event: string, callback: (socket: Socket) => void): void;
+  to(room: string): { emit(event: string, ...args: any[]): void };
+  emit(event: string, ...args: any[]): void;
+}
+
+export interface AuthenticatedSocket extends Socket {
   userId?: string;
 }
 
-export function setupWebSocket(server: HTTPServer) {
-  const io = new SocketIOServer(server, {
-    cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:3001',
-      credentials: true,
-    },
-  });
-
+/**
+ * Configure WebSocket event handlers and authentication middleware
+ * on a pre-constructed socket.io server instance.
+ *
+ * @param io - A socket.io Server instance created by the caller
+ * @returns The configured io instance
+ */
+export function setupWebSocket(io: SocketIOServer): SocketIOServer {
   // Middleware for authentication
   io.use((socket: AuthenticatedSocket, next) => {
     const token = socket.handshake.auth.token;

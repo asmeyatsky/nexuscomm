@@ -221,7 +221,7 @@ export class AIAnalysisQueue {
     try {
       const counts = await this.queue.getJobCounts();
       return {
-        waiting: counts.wait,
+        waiting: counts.waiting,
         active: counts.active,
         completed: counts.completed,
         failed: counts.failed,

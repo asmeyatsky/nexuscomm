@@ -239,8 +239,8 @@ export class PineconeVectorStoreAdapter {
       const stats = await index.describeIndexStats();
 
       return {
-        vectorCount: stats.totalVectorCount || 0,
-        indexSize: `${((stats.totalVectorCount || 0) * 0.001).toFixed(2)} KB`,
+        vectorCount: stats.totalRecordCount || 0,
+        indexSize: `${((stats.totalRecordCount || 0) * 0.001).toFixed(2)} KB`,
         dimension: this.EMBEDDING_DIM,
       };
     } catch (error) {

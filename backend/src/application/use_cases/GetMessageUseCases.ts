@@ -1,5 +1,5 @@
 import { UseCase } from './UseCase';
-import { GetMessageHistoryDTO, SearchMessageDTO } from '../dtos/MessageDTOs';
+import { GetMessageHistoryDTO, SearchMessageDTO, GetMessageByIdDTO } from '../dtos/MessageDTOs';
 import { MessageDomainService } from '../../domain/services/MessageDomainService';
 
 /**
@@ -189,11 +189,6 @@ export class SearchMessagesUseCase implements UseCase<SearchMessageDTO, any> {
  * 2. Transforms domain entity to appropriate output
  * 3. Delegates to domain service for business logic
  */
-export interface GetMessageByIdDTO {
-  messageId: string;
-  userId: string;
-}
-
 export class GetMessageByIdUseCase implements UseCase<GetMessageByIdDTO, any> {
   constructor(private messageDomainService: MessageDomainService) {}
 

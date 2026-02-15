@@ -73,6 +73,6 @@ export class Account {
   @OneToMany(() => Message, (message) => message.senderAccount)
   sentMessages: Message[];
 
-  @OneToMany(() => IdentityFilter, (filter) => filter.account)
+  @OneToMany(() => IdentityFilter, (filter) => filter.accounts)
   identityFilters: IdentityFilter[];
 }

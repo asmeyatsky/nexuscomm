@@ -89,15 +89,6 @@ export class IntelligentContactManagementService {
         userId,
         name: contactData.name!,
         avatar: contactData.avatar,
-        contactMethods: contactData.contactMethods || [],
-        relationship: contactData.relationship,
-        priority: contactData.priority || 3,
-        tags: contactData.tags || [],
-        timezone: contactData.timezone,
-        availability: contactData.availability,
-        metadata: contactData.metadata || {},
-        createdAt: new Date(),
-        updatedAt: new Date()
       });
       contact = await this.contactRepository.save(contact);
     }
@@ -208,13 +199,12 @@ export class IntelligentContactManagementService {
    * Analyze communication patterns for a contact
    */
   async analyzeCommunicationPatterns(contactId: string, userId: string): Promise<CommunicationPattern> {
-    // Get all conversations with this contact
-    const conversations = await this.conversationRepository.find({
-      where: {
-        userId,
-        participantIds: { $contains: [contactId] } // This would need to be adjusted for your schema
-      }
-    });
+    // Get all conversations with this contact using array containment operator
+    const conversations = await this.conversationRepository
+      .createQueryBuilder('conversation')
+      .where('conversation.userId = :userId', { userId })
+      .andWhere('conversation.participantIds @> :participantIds', { participantIds: [contactId] })
+      .getMany();
 
     // Get all messages in these conversations
     const messageCounts: Record<string, number> = {};
@@ -226,7 +216,7 @@ export class IntelligentContactManagementService {
     for (const conv of conversations) {
       const messages = await this.messageRepository.find({
         where: { conversationId: conv.id },
-        order: { createdAt: 'ASC' }
+        order: { createdAt: 'ASC' as const }
       });
 
       for (const msg of messages) {
@@ -318,7 +308,7 @@ export class IntelligentContactManagementService {
     if (filters?.sortBy === 'lastContacted') sortColumn = 'contact.lastContactedAt';
     else if (filters?.sortBy === 'priority') sortColumn = 'contact.priority';
 
-    query.orderBy(sortColumn, filters?.sortOrder || 'asc');
+    query.orderBy(sortColumn, (filters?.sortOrder?.toUpperCase() as 'ASC' | 'DESC') || 'ASC');
 
     const contacts = await query.getMany();
     return contacts as unknown as ContactProfile[];

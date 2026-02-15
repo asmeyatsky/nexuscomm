@@ -241,6 +241,7 @@ export class BusinessIntelligenceCRMService {
           channelDistribution: { email: 3, whatsapp: 2 }
         },
         notes: [],
+        metadata: {},
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -358,6 +359,7 @@ export class BusinessIntelligenceCRMService {
         content: 'Followed up on the proposal',
         sentiment: 0.8,
         importance: 'high',
+        metadata: {},
         createdAt: new Date()
       }
     ];
@@ -499,6 +501,7 @@ export class BusinessIntelligenceCRMService {
         channelDistribution: {}
       },
       notes: [],
+      metadata: {},
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -652,7 +655,8 @@ export class BusinessIntelligenceCRMService {
           status: contactData.status || 'new',
           leadSource: source,
           tags: contactData.tags || [],
-          notes: [`${source} import on ${new Date().toISOString()}`]
+          notes: [`${source} import on ${new Date().toISOString()}`],
+          metadata: {}
         });
 
         imported++;

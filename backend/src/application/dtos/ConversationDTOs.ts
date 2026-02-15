@@ -1,4 +1,4 @@
-import { UseCase } from './UseCase';
+import { UseCase } from '../use_cases/UseCase';
 import { ConversationDomainService } from '../../domain/services/ConversationDomainService';
 import { UserDomainService } from '../../domain/services/UserDomainService';
 

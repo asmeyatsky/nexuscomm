@@ -73,7 +73,7 @@ export class MessageAIAnalysisService {
 
           if (config.async) {
             const job = await this.queue.enqueue(jobData);
-            jobIds.push(job.id!);
+            jobIds.push(String(job.id));
             this.logger.debug(
               { jobId: job.id, messageId },
               'Queued sentiment analysis',
@@ -101,7 +101,7 @@ export class MessageAIAnalysisService {
 
           if (config.async) {
             const job = await this.queue.enqueue(jobData);
-            jobIds.push(job.id!);
+            jobIds.push(String(job.id));
             this.logger.debug(
               { jobId: job.id, messageId },
               'Queued categorization',
@@ -131,7 +131,7 @@ export class MessageAIAnalysisService {
 
           if (config.async) {
             const job = await this.queue.enqueue(jobData);
-            jobIds.push(job.id!);
+            jobIds.push(String(job.id));
             this.logger.debug(
               { jobId: job.id, messageId },
               'Queued suggestion generation',

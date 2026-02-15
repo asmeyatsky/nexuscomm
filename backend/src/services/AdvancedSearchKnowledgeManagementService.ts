@@ -334,7 +334,7 @@ export class AdvancedSearchKnowledgeManagementService {
    */
   async createKnowledgeArticle(
     userId: string,
-    articleData: Omit<KnowledgeArticle, 'id' | 'userId' | 'createdAt' | 'updatedAt' | 'metadata'>
+    articleData: Omit<KnowledgeArticle, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
   ): Promise<KnowledgeArticle> {
     const article: KnowledgeArticle = {
       id: `article-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

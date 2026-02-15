@@ -4,14 +4,17 @@ import { Conversation } from '@models/Conversation';
 import { AppError } from '@middleware/errorHandler';
 import { MessageService } from './MessageService';
 import { ConversationService } from './ConversationService';
+import { AccountService } from './AccountService';
 
 export class EmailProcessingService {
   private messageService: MessageService;
   private conversationService: ConversationService;
+  private accountService: AccountService;
 
   constructor() {
     this.messageService = new MessageService();
     this.conversationService = new ConversationService();
+    this.accountService = new AccountService();
   }
 
   /**
@@ -35,7 +38,7 @@ export class EmailProcessingService {
     }
 
     // Get conversation details
-    const conversation = await this.conversationService.getConversation(conversationId, userId);
+    const conversation = await this.conversationService.getConversationById(conversationId, userId);
     if (!conversation) {
       throw new AppError(404, 'Conversation not found', 'CONVERSATION_NOT_FOUND');
     }
@@ -82,7 +85,7 @@ export class EmailProcessingService {
     }
 
     // Get conversation details
-    const conversation = await this.conversationService.getConversation(conversationId, userId);
+    const conversation = await this.conversationService.getConversationById(conversationId, userId);
     if (!conversation) {
       throw new AppError(404, 'Conversation not found', 'CONVERSATION_NOT_FOUND');
     }
@@ -133,7 +136,7 @@ export class EmailProcessingService {
    */
   private async selectBestPlatformForConversation(conversation: Conversation, userId: string): Promise<string> {
     // Get user's connected accounts
-    const { accounts } = await this.conversationService.getAccountService().getAccounts(userId);
+    const accounts = await this.accountService.getUserAccounts(userId);
     const activeAccounts = accounts.filter(a => a.isActive);
 
     // Priority order for platforms

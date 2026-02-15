@@ -4,6 +4,7 @@ import { Conversation } from '@models/Conversation';
 import { Contact } from '@models/Contact';
 import { Account } from '@models/Account';
 import { AppError } from '@middleware/errorHandler';
+import { Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 
 // Define analytics interfaces
 export interface UserCommunicationMetrics {
@@ -305,10 +306,7 @@ export class AdvancedAnalyticsService {
     const messages = await this.messageRepository.find({
       where: {
         userId,
-        createdAt: {
-          $gte: startDate,
-          $lte: endDate
-        }
+        createdAt: Between(startDate, endDate)
       },
       order: { createdAt: 'ASC' }
     });

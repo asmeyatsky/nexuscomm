@@ -1,7 +1,7 @@
-import { MessagingAdapterPort, ExternalMessageServicePort } from '../ports/ExternalServicePorts';
-import { WhatsAppServiceAdapter } from './adapters/WhatsAppServiceAdapter';
-import { EmailServiceAdapter } from './adapters/EmailServiceAdapter';
-import { SMSServiceAdapter } from './adapters/SMSServiceAdapter';
+import { MessagingAdapterPort, ExternalMessageServicePort } from '../../domain/ports/ExternalServicePorts';
+import { WhatsAppServiceAdapter } from './WhatsAppServiceAdapter';
+import { EmailServiceAdapter } from './EmailServiceAdapter';
+import { SMSServiceAdapter } from './SMSServiceAdapter';
 import { Message } from '../../domain/entities/Message';
 
 /**

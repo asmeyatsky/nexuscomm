@@ -3,7 +3,6 @@ import { Message } from '@models/Message';
 import { Conversation } from '@models/Conversation';
 import { User } from '@models/User';
 import { AppError } from '@middleware/errorHandler';
-import { Notification } from '@models/Notification'; // Assuming notification model exists
 
 // Define notification interfaces
 export interface NotificationPreference {
@@ -313,6 +312,7 @@ export class IntelligentNotificationService {
       body: this.truncateMessage(message.content, 50),
       type: 'message',
       priority: this.determineMessagePriority(message, conversation),
+      deliveryMethod: 'push',
       scheduledAt: new Date(),
       metadata: {
         conversationId: message.conversationId,

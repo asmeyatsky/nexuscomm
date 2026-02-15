@@ -4,7 +4,7 @@
  * Run locally: docker run -p 8080:8080 semitechnologies/weaviate
  */
 
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import pino from 'pino';
 
 export interface VectorEmbedding {
@@ -27,7 +27,7 @@ export interface SearchResult {
 }
 
 export class WeaviateVectorStoreAdapter {
-  private client: axios.AxiosInstance;
+  private client: AxiosInstance;
   private logger: pino.Logger;
   private indexName: string;
 
@@ -123,11 +123,14 @@ export class WeaviateVectorStoreAdapter {
       });
 
       const results = response.data?.data?.Get?.[this.indexName] || [];
-      return results.map((item: Record<string, unknown>) => ({
-        id: item._additional?.id || '',
-        score: item._additional?.certainty || 0,
-        metadata: item,
-      }));
+      return results.map((item: Record<string, unknown>) => {
+        const additional = item._additional as Record<string, unknown> | undefined;
+        return {
+          id: (additional?.id as string) || '',
+          score: (additional?.certainty as number) || 0,
+          metadata: item,
+        };
+      });
     } catch (error) {
       this.logger.error({ error }, 'Failed to search vectors in Weaviate');
       throw error;

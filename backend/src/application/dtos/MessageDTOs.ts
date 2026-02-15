@@ -144,3 +144,16 @@ export interface SearchMessageDTO {
   limit?: number;
   offset?: number;
 }
+
+/**
+ * GetMessageByIdDTO - Data Transfer Object
+ *
+ * Architectural Intent:
+ * - Transfers data for retrieving a single message by ID
+ * - Provides a contract for message retrieval by ID
+ * - Transforms between external representation and domain representation
+ */
+export interface GetMessageByIdDTO {
+  messageId: string;
+  userId: string;
+}

@@ -1,16 +1,17 @@
 import { DataSource, Repository } from 'typeorm';
 import { ConversationRepositoryPort } from '@domain/ports/ConversationRepositoryPort';
 import { Conversation } from '@domain/valueObjects/Conversation';
+import { Conversation as ConversationEntity } from '../../models/Conversation';
 
 /**
  * TypeORMConversationRepositoryAdapter
- * 
+ *
  * Architectural Intent:
  * - Implements the ConversationRepositoryPort using TypeORM
  * - Acts as an adapter between domain and infrastructure layers
  * - Transforms between domain entities and TypeORM entities
  * - Provides infrastructure-specific implementation details
- * 
+ *
  * Key Design Decisions:
  * 1. Implements domain port interface
  * 2. Handles transformation between domain and data layer
@@ -18,29 +19,29 @@ import { Conversation } from '@domain/valueObjects/Conversation';
  * 4. Maintains transaction boundaries where needed
  */
 export class TypeORMConversationRepositoryAdapter implements ConversationRepositoryPort {
-  private repository: Repository<Conversation>;
+  private repository: Repository<ConversationEntity>;
 
   constructor(private dataSource: DataSource) {
-    this.repository = dataSource.getRepository(Conversation);
+    this.repository = dataSource.getRepository(ConversationEntity);
   }
 
   async findById(id: string): Promise<Conversation | null> {
-    const conversationEntity = await this.repository.findOne({
+    const entity = await this.repository.findOne({
       where: { id },
     });
 
-    return conversationEntity ? this.toDomain(conversationEntity) : null;
+    return entity ? this.toDomain(entity) : null;
   }
 
   async save(conversation: Conversation): Promise<Conversation> {
-    const conversationEntity = this.toTypeORM(conversation);
-    const savedEntity = await this.repository.save(conversationEntity);
+    const entity = this.toTypeORM(conversation);
+    const savedEntity = await this.repository.save(entity);
     return this.toDomain(savedEntity);
   }
 
   async update(conversation: Conversation): Promise<Conversation> {
-    const conversationEntity = this.toTypeORM(conversation);
-    const updatedEntity = await this.repository.save(conversationEntity);
+    const entity = this.toTypeORM(conversation);
+    const updatedEntity = await this.repository.save(entity);
     return this.toDomain(updatedEntity);
   }
 
@@ -49,12 +50,12 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
   }
 
   async findByParticipantId(userId: string): Promise<Conversation[]> {
-    const conversationEntities = await this.repository
+    const entities = await this.repository
       .createQueryBuilder('conversation')
       .where(':userId = ANY(conversation.participantIds)', { userId })
       .getMany();
 
-    return conversationEntities.map(entity => this.toDomain(entity));
+    return entities.map(entity => this.toDomain(entity));
   }
 
   async findByParticipantIds(userIds: string[]): Promise<Conversation[]> {
@@ -62,20 +63,20 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
     // For direct conversations, we'd match exactly 2 users
     if (userIds.length === 2) {
       const [user1, user2] = userIds;
-      const conversationEntities = await this.repository
+      const entities = await this.repository
         .createQueryBuilder('conversation')
         .where(
-          `(conversation.participantIds && ARRAY[:user1, :user2] 
+          `(conversation.participantIds && ARRAY[:user1, :user2]
             AND array_length(conversation.participantIds, 1) = 2)`,
           { user1, user2 }
         )
         .getMany();
 
-      return conversationEntities.map(entity => this.toDomain(entity));
+      return entities.map(entity => this.toDomain(entity));
     }
 
     // For group conversations, we look for conversations containing all users
-    const conversationEntities = await this.repository
+    const entities = await this.repository
       .createQueryBuilder('conversation')
       .where(
         `conversation.participantIds @> ARRAY[:...userIds]`,
@@ -83,7 +84,7 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
       )
       .getMany();
 
-    return conversationEntities.map(entity => this.toDomain(entity));
+    return entities.map(entity => this.toDomain(entity));
   }
 
   async findAllForUser(userId: string, limit?: number, offset?: number): Promise<Conversation[]> {
@@ -99,9 +100,9 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
       queryBuilder.offset(offset);
     }
 
-    const conversationEntities = await queryBuilder.getMany();
+    const entities = await queryBuilder.getMany();
 
-    return conversationEntities.map(entity => this.toDomain(entity));
+    return entities.map(entity => this.toDomain(entity));
   }
 
   async countForUser(userId: string): Promise<number> {
@@ -112,21 +113,21 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
   }
 
   async findUnreadConversations(userId: string): Promise<Conversation[]> {
-    const conversationEntities = await this.repository
+    const entities = await this.repository
       .createQueryBuilder('conversation')
       .where(':userId = ANY(conversation.participantIds)', { userId })
       .andWhere('conversation.unreadCount > 0')
       .orderBy('conversation.updatedAt', 'DESC')
       .getMany();
 
-    return conversationEntities.map(entity => this.toDomain(entity));
+    return entities.map(entity => this.toDomain(entity));
   }
 
   async updateLastMessageAt(conversationId: string, timestamp: Date): Promise<Conversation> {
     const result = await this.repository
       .createQueryBuilder()
-      .update(Conversation)
-      .set({ lastMessageAt: timestamp, updatedAt: new Date() })
+      .update(ConversationEntity)
+      .set({ lastMessageTimestamp: timestamp, updatedAt: new Date() })
       .where('id = :conversationId', { conversationId })
       .returning('*')
       .execute();
@@ -147,7 +148,7 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
   async updateUnreadCount(conversationId: string, count: number): Promise<Conversation> {
     const result = await this.repository
       .createQueryBuilder()
-      .update(Conversation)
+      .update(ConversationEntity)
       .set({ unreadCount: count, updatedAt: new Date() })
       .where('id = :conversationId', { conversationId })
       .returning('*')
@@ -167,18 +168,23 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
   }
 
   /**
-   * Transform TypeORM entity to domain entity
+   * Transform TypeORM entity to domain value object.
+   * Maps from the DB schema (ConversationEntity) to the domain Conversation VO.
    */
-  private toDomain(entity: Conversation): Conversation {
+  private toDomain(entity: ConversationEntity): Conversation {
+    // Derive conversation type from participant count
+    const type: 'direct' | 'group' | 'channel' =
+      entity.participantIds.length <= 2 ? 'direct' : 'group';
+
     return new Conversation({
       id: entity.id,
-      name: entity.name,
-      type: entity.type as 'direct' | 'group' | 'channel',
+      name: entity.participantNames?.[0] || undefined,
+      type,
       participantIds: entity.participantIds || [],
       isArchived: entity.isArchived || false,
       isMuted: entity.isMuted || false,
       unreadCount: entity.unreadCount || 0,
-      lastMessageAt: entity.lastMessageAt || undefined,
+      lastMessageAt: entity.lastMessageTimestamp || undefined,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
       metadata: entity.metadata || {},
@@ -186,21 +192,26 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
   }
 
   /**
-   * Transform domain entity to TypeORM entity
+   * Transform domain value object to TypeORM entity for persistence.
    */
-  private toTypeORM(domain: Conversation): Conversation {
-    const entity = new Conversation();
+  private toTypeORM(domain: Conversation): ConversationEntity {
+    const entity = new ConversationEntity();
     entity.id = domain.id;
-    entity.name = domain.name;
-    entity.type = domain.type;
+    entity.userId = domain.metadata?.userId || domain.participantIds[0] || '';
     entity.participantIds = domain.participantIds;
+    entity.participantNames = domain.metadata?.participantNames || [];
+    entity.participantAvatars = domain.metadata?.participantAvatars || [];
+    entity.channels = domain.metadata?.channels || [];
+    entity.lastMessage = domain.metadata?.lastMessage || '';
+    entity.lastMessageTimestamp = domain.lastMessageAt || null as unknown as Date;
+    entity.lastMessageDirection = domain.metadata?.lastMessageDirection || 'outbound';
     entity.isArchived = domain.isArchived;
     entity.isMuted = domain.isMuted;
+    entity.isPinned = domain.metadata?.isPinned || false;
     entity.unreadCount = domain.unreadCount;
-    entity.lastMessageAt = domain.lastMessageAt || null;
     entity.createdAt = domain.createdAt;
     entity.updatedAt = domain.updatedAt;
-    entity.metadata = domain.metadata;
+    entity.metadata = domain.metadata || {};
 
     return entity;
   }

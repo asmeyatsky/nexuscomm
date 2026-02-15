@@ -69,7 +69,7 @@ export class SmartScheduleRecommendation {
     this.recommendedTime = new Date(recommendedTime);
     this.engagementScore = engagementScore;
     this.reason = reason;
-    this.alternativeWindows = Object.freeze([...alternativeWindows]);
+    this.alternativeWindows = [...alternativeWindows];
     this.metrics = Object.freeze({ ...metrics });
     this.urgencyLevel = urgencyLevel;
     this.generatedAt = new Date(generatedAt);

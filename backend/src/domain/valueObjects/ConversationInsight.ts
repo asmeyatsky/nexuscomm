@@ -99,10 +99,10 @@ export class ConversationInsight {
     this.totalMessages = totalMessages;
     this.uniqueParticipants = uniqueParticipants;
     this.averageResponseTime = averageResponseTime;
-    this.participantStats = Object.freeze([...participantStats]);
-    this.engagementTrends = Object.freeze([...engagementTrends]);
+    this.participantStats = [...participantStats];
+    this.engagementTrends = [...engagementTrends];
     this.conversationHealth = Object.freeze({ ...conversationHealth });
-    this.topTopics = Object.freeze([...topTopics]);
+    this.topTopics = [...topTopics];
     this.averageSentiment = averageSentiment;
     this.sentimentScore = sentimentScore;
     this.generatedAt = new Date(generatedAt);

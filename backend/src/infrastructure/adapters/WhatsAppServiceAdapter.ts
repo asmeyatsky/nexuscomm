@@ -1,4 +1,4 @@
-import { ExternalMessageServicePort, WhatsAppServiceAdapterPort } from '../ports/ExternalServicePorts';
+import { ExternalMessageServicePort, WhatsAppServiceAdapterPort } from '../../domain/ports/ExternalServicePorts';
 import { Message } from '../../domain/entities/Message';
 import { User } from '../../domain/valueObjects/User';
 import { Conversation } from '../../domain/valueObjects/Conversation';

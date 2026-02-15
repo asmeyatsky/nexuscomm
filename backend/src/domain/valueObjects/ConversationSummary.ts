@@ -65,12 +65,12 @@ export class ConversationSummary {
     }
 
     this.conversationId = conversationId;
-    this.messageIds = Object.freeze([...messageIds]);
+    this.messageIds = [...messageIds];
     this.summary = summary;
     this.length = length;
-    this.keyPoints = Object.freeze([...keyPoints]);
-    this.mainTopics = Object.freeze([...mainTopics]);
-    this.participants = Object.freeze([...participants]);
+    this.keyPoints = [...keyPoints];
+    this.mainTopics = [...mainTopics];
+    this.participants = [...participants];
     this.metrics = Object.freeze({ ...metrics });
     this.generatedAt = new Date(generatedAt);
     this.expiresAt = new Date(generatedAt.getTime() + ttlHours * 60 * 60 * 1000);

@@ -52,16 +52,29 @@ export class GmailIntegration extends BaseIntegration {
 
   /**
    * Send email
+   *
+   * @param recipientId - The recipient email address
+   * @param message - The email body. To include a subject line, use the format "Subject: <subject>\n<body>".
+   * @param mediaUrls - Optional array of media attachment URLs (currently unused)
    */
   async sendMessage(
-    to: string,
-    subject: string,
-    body: string,
+    recipientId: string,
+    message: string,
     mediaUrls?: string[]
   ): Promise<any> {
     try {
+      let subject = '(No Subject)';
+      let body = message;
+
+      // Parse subject from message if provided in "Subject: ...\n..." format
+      const subjectMatch = message.match(/^Subject:\s*(.+)\n([\s\S]*)$/);
+      if (subjectMatch) {
+        subject = subjectMatch[1].trim();
+        body = subjectMatch[2].trim();
+      }
+
       const emailHeaders = [
-        `To: ${to}`,
+        `To: ${recipientId}`,
         `Subject: ${subject}`,
         'Content-Type: text/plain; charset="UTF-8"',
         'MIME-Version: 1.0',
