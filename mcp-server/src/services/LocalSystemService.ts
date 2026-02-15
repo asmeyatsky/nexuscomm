@@ -244,11 +244,15 @@ export class LocalSystemService {
 
           case 'scroll':
             if (action.coordinates) {
-              await page.evaluate((coords) => {
-                window.scrollTo(coords.x, coords.y);
+              await page.evaluate((coords: { x: number; y: number }) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (globalThis as any).scrollTo(coords.x, coords.y);
               }, action.coordinates);
             } else {
-              await page.evaluate(() => window.scrollBy(0, 500));
+              await page.evaluate(() => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (globalThis as any).scrollBy(0, 500);
+              });
             }
             return { success: true, message: 'Scrolled page' };
 

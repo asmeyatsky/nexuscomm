@@ -10,16 +10,18 @@ import { ConversationSummary } from '../types/index.js';
 export class NexusCommService {
   private client: AxiosInstance;
   private logger: pino.Logger;
+  private readonly _apiKey: string;
 
   constructor(
-    private apiUrl: string,
-    private apiKey: string,
+    apiUrl: string,
+    apiKey: string,
     private userId: string
   ) {
+    this._apiKey = apiKey;
     this.client = axios.create({
       baseURL: apiUrl,
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${this._apiKey}`,
         'Content-Type': 'application/json',
       },
       timeout: 30000,

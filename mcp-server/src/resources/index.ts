@@ -93,7 +93,6 @@ export function createResources(
           timestamp: new Date().toISOString(),
           nexusComm: {
             connected: nexusCommStatus,
-            apiUrl: nexusComm['apiUrl'],
           },
           system: systemInfo,
           capabilities: {
