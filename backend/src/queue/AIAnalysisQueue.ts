@@ -35,7 +35,13 @@ export class AIAnalysisQueue {
   private categorizeMessageUseCase: CategorizeMessageUseCase;
   private generateReplySuggestionsUseCase: GenerateReplySuggestionsUseCase;
 
-  constructor(redisUrl: string = process.env.REDIS_URL || 'redis://127.0.0.1:6379') {
+  constructor(redisUrl: string = process.env.REDIS_URL) {
+    if (!redisUrl) {
+      logger.warn('REDIS_URL not set - AI analysis will run synchronously');
+      this.queue = null;
+      return;
+    }
+
     this.queue = new Bull<AIJobData>('ai-analysis', redisUrl, {
       defaultJobOptions: {
         attempts: 3,
@@ -58,7 +64,12 @@ export class AIAnalysisQueue {
   /**
    * Queue a job for async processing
    */
-  async enqueue(jobData: AIJobData): Promise<Job<AIJobData>> {
+  async enqueue(jobData: AIJobData): Promise<Job<AIJobData> | null> {
+    if (!this.queue) {
+      logger.warn('Queue not initialized - skipping enqueue');
+      return null;
+    }
+
     try {
       const job = await this.queue.add(jobData, {
         jobId: `${jobData.type}-${jobData.messageId}-${Date.now()}`,

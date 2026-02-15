@@ -22,23 +22,19 @@ services:
       - nexuscomm-network
     restart: unless-stopped
 
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
-    container_name: nexuscomm_redis
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
-    volumes:
-      - redis_data:/data
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - nexuscomm-network
-    restart: unless-stopped
+  # Redis - optional (use Upstash for cloud or skip for in-memory)
+  # Uncomment below to use local Redis, otherwise uses Upstash via REDIS_URL env var
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: nexuscomm_redis
+  #   command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
+  #   volumes:
+  #     - redis_data:/data
+  #   ports:
+  #     - "${REDIS_PORT:-6379}:6379"
+  #   networks:
+  #     - nexuscomm-network
+  #   restart: unless-stopped
 
   # Backend API
   backend:
@@ -46,18 +42,13 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: nexuscomm_backend
-    depends_on:
-      redis:
-        condition: service_healthy
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
       API_URL: ${API_URL:-http://localhost:3000}
       CLIENT_URL: ${CLIENT_URL:-http://localhost:3001}
       DATABASE_URL: ${DATABASE_URL:-}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_password}
+      REDIS_URL: ${REDIS_URL:-}  # Upstash URL or leave empty for in-memory
       JWT_SECRET: ${JWT_SECRET:-dev_jwt_secret_key_change_in_production}
       JWT_EXPIRY: ${JWT_EXPIRY:-7d}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-dev_refresh_token_secret}
