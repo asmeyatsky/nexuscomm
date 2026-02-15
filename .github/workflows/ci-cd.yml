@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master, develop]
 
+permissions:
+  contents: read
+  security-events: write
+
 env:
   GCP_PROJECT_ID: nexuscomm-487512
   GCP_REGION: europe-west2
@@ -57,13 +61,6 @@ jobs:
           DATABASE_URL: postgres://test:test@localhost:5432/test_db
         continue-on-error: true
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./backend/coverage/coverage-final.json
-          flags: backend
-        continue-on-error: true
-
   # Frontend Tests and Linting
   frontend:
     runs-on: ubuntu-latest
@@ -90,13 +87,6 @@ jobs:
 
       - name: Run tests
         run: npm --prefix web run test:coverage
-        continue-on-error: true
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./web/coverage/coverage-final.json
-          flags: frontend
         continue-on-error: true
 
   # Docker Build and Push to GCP Artifact Registry
@@ -158,14 +148,12 @@ jobs:
           scan-ref: '.'
           format: 'sarif'
           output: 'trivy-results.sarif'
-        continue-on-error: true
 
       - name: Upload Trivy results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-results.sarif'
           category: 'trivy'
-        continue-on-error: true
 
   # Deploy to Cloud Run
   deploy:
