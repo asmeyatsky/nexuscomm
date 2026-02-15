@@ -1,6 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 import { UserRepositoryPort } from '../../domain/ports/UserRepositoryPort';
-import { User } from '../../domain/value_objects/User';
+import { User } from '../../domain/valueObjects/User';
 import { User as UserEntity } from '../entities/User'; // The TypeORM entity
 
 /**

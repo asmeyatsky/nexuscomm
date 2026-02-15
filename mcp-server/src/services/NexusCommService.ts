@@ -5,7 +5,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 import pino from 'pino';
-import { MessageContext, ConversationSummary } from '../types/index.js';
+import { ConversationSummary } from '../types/index.js';
 
 export class NexusCommService {
   private client: AxiosInstance;

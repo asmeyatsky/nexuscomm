@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "nexuscomm": {
+      "command": "node",
+      "args": ["mcp-server/dist/index.js"],
+      "env": {
+        "NEXUSCOMM_API_URL": "http://localhost:3000",
+        "NEXUSCOMM_API_KEY": "${NEXUSCOMM_API_KEY}",
+        "NEXUSCOMM_USER_ID": "${NEXUSCOMM_USER_ID}",
+        "ALLOWED_PATHS": "${HOME}/nexuscomm",
+        "ENABLE_FILE_SYSTEM": "true",
+        "ENABLE_SHELL_ACCESS": "false",
+        "ENABLE_BROWSER_CONTROL": "false",
+        "LOG_LEVEL": "info",
+        "RATE_LIMIT_WINDOW_MS": "60000",
+        "RATE_LIMIT_MAX_REQUESTS": "100",
+        "MAX_TOOL_TIMEOUT_MS": "30000",
+        "ENABLE_AUDIT_LOG": "true"
+      }
+    }
+  }
+}

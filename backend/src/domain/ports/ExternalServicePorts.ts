@@ -1,6 +1,6 @@
 import { Message } from '../../domain/entities/Message';
-import { User } from '../../domain/value_objects/User';
-import { Conversation } from '../../domain/value_objects/Conversation';
+import { User } from '../../domain/valueObjects/User';
+import { Conversation } from '../../domain/valueObjects/Conversation';
 
 /**
  * ExternalMessageServicePort Interface

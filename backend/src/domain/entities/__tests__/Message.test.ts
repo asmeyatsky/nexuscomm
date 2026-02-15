@@ -15,9 +15,9 @@
  */
 
 import { Message } from '@domain/entities/Message';
-import { MessageContent } from '@domain/value_objects/MessageContent';
-import { Attachment } from '@domain/value_objects/Attachment';
-import { Reaction } from '@domain/value_objects/Reaction';
+import { MessageContent } from '@domain/valueObjects/MessageContent';
+import { Attachment } from '@domain/valueObjects/Attachment';
+import { Reaction } from '@domain/valueObjects/Reaction';
 
 describe('Message Entity', () => {
   const baseMessageProps = {

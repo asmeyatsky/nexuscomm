@@ -1,4 +1,4 @@
-import { AppDataSource } from '../config/database';
+import { AppDataSource } from '@config/database';
 import { MessageDomainService } from '../domain/services/MessageDomainService';
 import { ConversationDomainService } from '../domain/services/ConversationDomainService';
 import { UserDomainService } from '../domain/services/UserDomainService';

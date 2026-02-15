@@ -23,6 +23,7 @@
       "@config/*": ["src/config/*"],
       "@models/*": ["src/models/*"],
       "@controllers/*": ["src/controllers/*"],
+      "@routes/*": ["src/routes/*"],
       "@services/*": ["src/services/*"],
       "@middleware/*": ["src/middleware/*"],
       "@utils/*": ["src/utils/*"],

@@ -3,7 +3,7 @@ import { MessageDomainService } from '../../domain/services/MessageDomainService
 import { UserDomainService } from '../../domain/services/UserDomainService';
 import { ConversationDomainService } from '../../domain/services/ConversationDomainService';
 import { Message } from '../../domain/entities/Message';
-import { MessageContent } from '../../domain/value_objects/MessageContent';
+import { MessageContent } from '../../domain/valueObjects/MessageContent';
 
 /**
  * Advanced Messaging Feature Use Cases

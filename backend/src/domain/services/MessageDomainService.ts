@@ -1,11 +1,11 @@
 import { Message } from '../entities/Message';
-import { User } from '../value_objects/User';
-import { Conversation } from '../value_objects/Conversation';
+import { User } from '../valueObjects/User';
+import { Conversation } from '../valueObjects/Conversation';
 import { MessageRepositoryPort } from '../ports/MessageRepositoryPort';
 import { ConversationRepositoryPort } from '../ports/ConversationRepositoryPort';
-import { MessageContent } from '../value_objects/MessageContent';
-import { Attachment } from '../value_objects/Attachment';
-import { Reaction } from '../value_objects/Reaction';
+import { MessageContent } from '../valueObjects/MessageContent';
+import { Attachment } from '../valueObjects/Attachment';
+import { Reaction } from '../valueObjects/Reaction';
 
 /**
  * MessageDomainService

@@ -11,6 +11,8 @@ import pino from 'pino';
 import chokidar from 'chokidar';
 import { FileSystemOptions, ShellCommand, BrowserAction } from '../types/index.js';
 
+let puppeteer: typeof import('puppeteer') | null = null;
+
 const execAsync = promisify(exec);
 
 export class LocalSystemService {
@@ -63,7 +65,7 @@ export class LocalSystemService {
           await fs.writeFile(validPath, options.content, 'utf-8');
           return { success: true, message: 'File written successfully' };
           
-        case 'list':
+        case 'list': {
           const entries = await fs.readdir(validPath, { withFileTypes: true });
           return entries.map(entry => ({
             name: entry.name,
@@ -71,6 +73,7 @@ export class LocalSystemService {
             isFile: entry.isFile(),
             path: path.join(validPath, entry.name),
           }));
+        }
           
         case 'delete':
           await fs.rm(validPath, { recursive: options.recursive || false });
@@ -195,22 +198,85 @@ export class LocalSystemService {
   }
 
   /**
-   * Browser automation (placeholder for future implementation)
+   * Browser automation using Puppeteer
    */
-  async browserAction(action: BrowserAction): Promise<any> {
+  async browserAction(action: BrowserAction): Promise<unknown> {
     if (!this.enableBrowserControl) {
-      throw new Error('Browser control is disabled');
+      throw new Error('Browser control is disabled. Set ENABLE_BROWSER_CONTROL=true to enable.');
     }
 
-    // This would integrate with a browser automation library like Puppeteer
-    // For now, return a placeholder response
-    this.logger.info({ action }, 'Browser action requested');
-    
-    return {
-      success: true,
-      message: `Browser action '${action.action}' executed successfully`,
-      // In real implementation, would return actual results
-    };
+    this.logger.info({ action }, 'Executing browser action');
+
+    try {
+      if (!puppeteer) {
+        puppeteer = await import('puppeteer');
+      }
+
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
+
+      try {
+        const page = await browser.newPage();
+
+        switch (action.action) {
+          case 'navigate':
+            if (!action.url) {
+              throw new Error('URL is required for navigate action');
+            }
+            await page.goto(action.url, { waitUntil: 'networkidle0' });
+            return { success: true, message: `Navigated to ${action.url}`, url: action.url };
+
+          case 'click':
+            if (!action.selector) {
+              throw new Error('Selector is required for click action');
+            }
+            await page.click(action.selector);
+            return { success: true, message: `Clicked element: ${action.selector}` };
+
+          case 'type':
+            if (!action.selector || action.text === undefined) {
+              throw new Error('Selector and text are required for type action');
+            }
+            await page.type(action.selector, action.text);
+            return { success: true, message: `Typed text into: ${action.selector}` };
+
+          case 'scroll':
+            if (action.coordinates) {
+              await page.evaluate((coords) => {
+                window.scrollTo(coords.x, coords.y);
+              }, action.coordinates);
+            } else {
+              await page.evaluate(() => window.scrollBy(0, 500));
+            }
+            return { success: true, message: 'Scrolled page' };
+
+          case 'screenshot': {
+            const screenshot = await page.screenshot({ encoding: 'base64' });
+            return { success: true, message: 'Screenshot captured', data: screenshot };
+          }
+
+          case 'extract': {
+            if (!action.selector) {
+              throw new Error('Selector is required for extract action');
+            }
+            const elements = await page.$$eval(action.selector, (els) => 
+              els.map((el) => el.textContent?.trim() || '')
+            );
+            return { success: true, message: `Extracted ${elements.length} elements`, elements };
+          }
+
+          default:
+            throw new Error(`Unknown browser action: ${action.action}`);
+        }
+      } finally {
+        await browser.close();
+      }
+    } catch (error) {
+      this.logger.error({ error, action }, 'Browser action failed');
+      throw error;
+    }
   }
 
   /**
@@ -220,7 +286,7 @@ export class LocalSystemService {
     const validPath = this.validatePath(watchPath);
     
     const watcher = chokidar.watch(validPath, {
-      ignored: /(^|[\/\\])\../, // ignore dotfiles
+      ignored: /(^|[/\\])\./, // ignore dotfiles
       persistent: true,
     });
 

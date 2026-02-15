@@ -5,11 +5,18 @@
 
 import { NexusCommService } from '../services/NexusCommService.js';
 import { LocalSystemService } from '../services/LocalSystemService.js';
+import { SecurityManager } from '../index.js';
 
 export function createProductivityTools(
   nexusComm: NexusCommService, 
-  localSystem: LocalSystemService
-) {
+  localSystem: LocalSystemService,
+  _securityManager: SecurityManager
+): Record<string, {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  handler: (args: unknown) => Promise<unknown>;
+}> {
   return {
     /**
      * Smart email/message triage
@@ -92,10 +99,9 @@ export function createProductivityTools(
           },
         },
       },
-      handler: async (args: any) => {
-        const date = args.date ? new Date(args.date) : new Date();
-        const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+      handler: async (args: unknown) => {
+        const params = args as { date?: string; includeAnalytics?: boolean; format?: string };
+        const date = params.date ? new Date(params.date) : new Date();
 
         const conversations = await nexusComm.getConversations();
         const summaries = [];
@@ -147,7 +153,7 @@ export function createProductivityTools(
         },
         required: ['conversationId', 'participantIds'],
       },
-      handler: async (args: any) => {
+      handler: async (_args: unknown) => {
         // This would use the existing scheduling recommendation use case
         // For now, return a smart suggestion based on common patterns
         const now = new Date();
@@ -304,7 +310,7 @@ export function createProductivityTools(
 /**
  * Helper function to categorize conversations
  */
-function categorizeConversation(conversation: any, criteria: any): string {
+function categorizeConversation(conversation: any, _criteria: unknown): string {
   // Simple categorization logic
   if (conversation.unreadCount > 5) return 'urgent';
   if (conversation.unreadCount > 0) return 'important';

@@ -18,7 +18,7 @@ import { CreateMessageUseCase } from '@application/use_cases/CreateMessageUseCas
 import { MessageDomainService } from '@domain/services/MessageDomainService';
 import { CreateMessageDTO } from '@application/dtos/MessageDTOs';
 import { Message } from '@domain/entities/Message';
-import { MessageContent } from '@domain/value_objects/MessageContent';
+import { MessageContent } from '@domain/valueObjects/MessageContent';
 
 // Mock MessageDomainService
 const createMockMessageDomainService = (): jest.Mocked<MessageDomainService> => {

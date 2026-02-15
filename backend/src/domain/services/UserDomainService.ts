@@ -1,4 +1,4 @@
-import { User } from '../value_objects/User';
+import { User } from '../valueObjects/User';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 
 /**

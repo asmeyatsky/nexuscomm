@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import { User } from '../value_objects/User';
-import { Conversation } from '../value_objects/Conversation';
-import { MessageContent } from '../value_objects/MessageContent';
-import { Attachment } from '../value_objects/Attachment';
-import { Reaction } from '../value_objects/Reaction';
+import { User } from '../valueObjects/User';
+import { Conversation } from '../valueObjects/Conversation';
+import { MessageContent } from '../valueObjects/MessageContent';
+import { Attachment } from '../valueObjects/Attachment';
+import { Reaction } from '../valueObjects/Reaction';
 
 /**
  * Message Domain Entity

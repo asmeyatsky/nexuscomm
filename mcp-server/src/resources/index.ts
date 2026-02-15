@@ -5,7 +5,6 @@
 
 import { NexusCommService } from '../services/NexusCommService.js';
 import { LocalSystemService } from '../services/LocalSystemService.js';
-import { MCPResource } from '../types/index.js';
 
 export function createResources(
   nexusComm: NexusCommService,
@@ -151,8 +150,6 @@ export function createResources(
       mimeType: 'application/json',
       handler: async () => {
         const today = new Date();
-        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
 
         const conversations = await nexusComm.getConversations();
         const summaries = [];

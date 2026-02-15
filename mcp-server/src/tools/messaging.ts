@@ -3,11 +3,15 @@
  * MCP tools for managing conversations and messages
  */
 
-// import { z } from 'zod'; // Zod not needed for basic MCP tool schema
 import { NexusCommService } from '../services/NexusCommService.js';
-import { MessageContext } from '../types/index.js';
+import { SecurityManager } from '../index.js';
 
-export function createMessagingTools(nexusComm: NexusCommService) {
+export function createMessagingTools(nexusComm: NexusCommService, _securityManager: SecurityManager): Record<string, {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  handler: (args: unknown) => Promise<unknown>;
+}> {
   return {
     /**
      * Get list of conversations
@@ -32,8 +36,8 @@ export function createMessagingTools(nexusComm: NexusCommService) {
           },
         },
       },
-      handler: async (args: any) => {
-        return await nexusComm.getConversations(args);
+      handler: async (args: unknown) => {
+        return await nexusComm.getConversations(args as Record<string, unknown>);
       },
     },
 

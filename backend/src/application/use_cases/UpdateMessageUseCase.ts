@@ -1,7 +1,7 @@
 import { UseCase } from './UseCase';
 import { UpdateMessageDTO } from '../dtos/MessageDTOs';
 import { MessageDomainService } from '../../domain/services/MessageDomainService';
-import { MessageContent } from '../../domain/value_objects/MessageContent';
+import { MessageContent } from '../../domain/valueObjects/MessageContent';
 
 /**
  * UpdateMessageUseCase

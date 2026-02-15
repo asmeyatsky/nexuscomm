@@ -17,7 +17,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { TypeORMMessageRepositoryAdapter } from '@infrastructure/repositories/TypeORMMessageRepositoryAdapter';
 import { Message } from '@domain/entities/Message';
-import { MessageContent } from '@domain/value_objects/MessageContent';
+import { MessageContent } from '@domain/valueObjects/MessageContent';
 import { Message as MessageEntity } from '@models/Message';
 
 // Mock TypeORM DataSource

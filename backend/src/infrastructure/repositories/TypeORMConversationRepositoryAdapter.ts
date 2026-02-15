@@ -1,6 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 import { ConversationRepositoryPort } from '../../domain/ports/ConversationRepositoryPort';
-import { Conversation } from '../../domain/value_objects/Conversation';
+import { Conversation } from '../../domain/valueObjects/Conversation';
 import { Conversation as ConversationEntity } from '../entities/Conversation'; // The TypeORM entity
 
 /**

@@ -4,9 +4,15 @@
  */
 
 import { LocalSystemService } from '../services/LocalSystemService.js';
+import { SecurityManager } from '../index.js';
 import { FileSystemOptions, ShellCommand, BrowserAction } from '../types/index.js';
 
-export function createSystemTools(localSystem: LocalSystemService) {
+export function createSystemTools(localSystem: LocalSystemService, securityManager: SecurityManager): Record<string, {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  handler: (args: unknown) => Promise<unknown>;
+}> {
   return {
     /**
      * File system operations
@@ -41,8 +47,12 @@ export function createSystemTools(localSystem: LocalSystemService) {
         },
         required: ['path', 'operation'],
       },
-      handler: async (args: FileSystemOptions) => {
-        return await localSystem.fileSystem(args);
+      handler: async (args: unknown) => {
+        const opts = args as FileSystemOptions;
+        if (opts.path && !securityManager.validatePath(opts.path)) {
+          throw new Error('Path access denied: path traversal or unauthorized path');
+        }
+        return await localSystem.fileSystem(opts);
       },
     },
 
@@ -79,8 +89,15 @@ export function createSystemTools(localSystem: LocalSystemService) {
         },
         required: ['command'],
       },
-      handler: async (args: ShellCommand) => {
-        return await localSystem.executeCommand(args);
+      handler: async (args: unknown) => {
+        const cmd = args as ShellCommand;
+        if (cmd.command) {
+          const validation = securityManager.validateCommand(cmd.command);
+          if (!validation.valid) {
+            throw new Error(validation.reason);
+          }
+        }
+        return await localSystem.executeCommand(cmd);
       },
     },
 
@@ -121,8 +138,9 @@ export function createSystemTools(localSystem: LocalSystemService) {
         },
         required: ['action'],
       },
-      handler: async (args: BrowserAction) => {
-        return await localSystem.browserAction(args);
+      handler: async (args: unknown) => {
+        const action = args as BrowserAction;
+        return await localSystem.browserAction(action);
       },
     },
 
@@ -165,13 +183,15 @@ export function createSystemTools(localSystem: LocalSystemService) {
         },
         required: ['path'],
       },
-      handler: async (args: { path: string; events?: string[] }) => {
-        // This would set up a watcher and return a watch ID
-        // For now, return a placeholder indicating setup
+      handler: async (args: unknown) => {
+        const opts = args as { path: string; events?: string[] };
+        if (!securityManager.validatePath(opts.path)) {
+          throw new Error('Path access denied');
+        }
         return {
           success: true,
           watchId: `watch_${Date.now()}`,
-          message: `Started watching ${args.path}`,
+          message: `Started watching ${opts.path}`,
         };
       },
     },
@@ -196,11 +216,15 @@ export function createSystemTools(localSystem: LocalSystemService) {
         },
         required: ['path'],
       },
-      handler: async (args: { path: string; recursive?: boolean }) => {
+      handler: async (args: unknown) => {
+        const opts = args as { path: string; recursive?: boolean };
+        if (!securityManager.validatePath(opts.path)) {
+          throw new Error('Path access denied');
+        }
         return await localSystem.fileSystem({
-          path: args.path,
+          path: opts.path,
           operation: 'write',
-          content: '', // Empty directory creation
+          content: '',
         });
       },
     },
@@ -229,19 +253,19 @@ export function createSystemTools(localSystem: LocalSystemService) {
         },
         required: ['path'],
       },
-      handler: async (args: { 
-        path: string; 
-        startLine?: number; 
-        endLine?: number; 
-      }) => {
+      handler: async (args: unknown) => {
+        const opts = args as { path: string; startLine?: number; endLine?: number };
+        if (!securityManager.validatePath(opts.path)) {
+          throw new Error('Path access denied');
+        }
         const content = await localSystem.fileSystem({
-          path: args.path,
+          path: opts.path,
           operation: 'read',
         });
 
         const lines = content.split('\n');
-        const start = args.startLine || 1;
-        const end = args.endLine || lines.length;
+        const start = opts.startLine || 1;
+        const end = opts.endLine || lines.length;
         
         const selectedLines = lines
           .slice(start - 1, end)

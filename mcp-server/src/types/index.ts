@@ -21,6 +21,30 @@ export interface MCPConfig {
     defaultModel: string;
     maxTokens: number;
   };
+  security: {
+    rateLimitWindowMs: number;
+    rateLimitMaxRequests: number;
+    maxToolTimeoutMs: number;
+    enableAuditLog: boolean;
+  };
+}
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string;
+  action: string;
+  tool: string;
+  userId: string;
+  params?: Record<string, unknown>;
+  success: boolean;
+  durationMs?: number;
+  error?: string;
+}
+
+export interface RateLimitConfig {
+  allowedPaths?: string[];
+  maxRequests: number;
+  windowMs: number;
 }
 
 export interface MessageContext {

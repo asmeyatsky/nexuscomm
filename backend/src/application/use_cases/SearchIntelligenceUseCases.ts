@@ -2,7 +2,7 @@ import { UseCase } from '../use_cases/UseCase';
 import { MessageDomainService } from '../../domain/services/MessageDomainService';
 import { ConversationDomainService } from '../../domain/services/ConversationDomainService';
 import { Message } from '../../domain/entities/Message';
-import { MessageContent } from '../../domain/value_objects/MessageContent';
+import { MessageContent } from '../../domain/valueObjects/MessageContent';
 
 /**
  * Search and Intelligence Feature Use Cases

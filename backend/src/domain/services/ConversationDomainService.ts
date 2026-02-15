@@ -1,5 +1,5 @@
-import { Conversation } from '../value_objects/Conversation';
-import { User } from '../value_objects/User';
+import { Conversation } from '../valueObjects/Conversation';
+import { User } from '../valueObjects/User';
 import { ConversationRepositoryPort } from '../ports/ConversationRepositoryPort';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 

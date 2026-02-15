@@ -18,9 +18,9 @@ import { MessageDomainService } from '@domain/services/MessageDomainService';
 import { MessageRepositoryPort } from '@domain/ports/MessageRepositoryPort';
 import { ConversationRepositoryPort } from '@domain/ports/ConversationRepositoryPort';
 import { Message } from '@domain/entities/Message';
-import { MessageContent } from '@domain/value_objects/MessageContent';
-import { Conversation } from '@domain/value_objects/Conversation';
-import { Reaction } from '@domain/value_objects/Reaction';
+import { MessageContent } from '@domain/valueObjects/MessageContent';
+import { Conversation } from '@domain/valueObjects/Conversation';
+import { Reaction } from '@domain/valueObjects/Reaction';
 
 // Mock repositories
 const createMockMessageRepository = (): jest.Mocked<MessageRepositoryPort> => ({

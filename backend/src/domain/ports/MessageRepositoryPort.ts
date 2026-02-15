@@ -1,6 +1,6 @@
 import { Message } from '../entities/Message';
-import { User } from '../value_objects/User';
-import { Conversation } from '../value_objects/Conversation';
+import { User } from '../valueObjects/User';
+import { Conversation } from '../valueObjects/Conversation';
 
 /**
  * MessageRepositoryPort Interface
