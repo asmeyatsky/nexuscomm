@@ -1,124 +1,165 @@
 # NexusComm - Unified Messaging Platform
 
-A modern, full-stack messaging application built with clean architecture principles and domain-driven design. NexusComm provides a unified interface for managing conversations with support for multiple messaging channels and real-time communication.
+A modern, full-stack unified messaging platform built with clean architecture and domain-driven design. NexusComm consolidates conversations across channels (WhatsApp, Gmail, Instagram, LinkedIn) into a single interface, powered by AI intelligence and extensible via the Model Context Protocol (MCP).
 
 ## Overview
 
-NexusComm is a **monorepo** project consisting of:
-- **Backend**: Express.js API gateway with TypeORM and PostgreSQL
-- **Web**: Next.js 14 frontend application
-- **Mobile**: React Native mobile app with Expo
-- **Shared**: Shared types and utilities across packages
+NexusComm is a **monorepo** consisting of:
+
+| Package | Description | Tech |
+|---------|-------------|------|
+| **backend** | Express.js API with TypeORM + PostgreSQL | Node.js, TypeScript |
+| **web** | Next.js 14 frontend | React 18, Tailwind CSS, shadcn/ui |
+| **mobile** | React Native mobile app | Expo, React Navigation |
+| **mcp-server** | MCP server for AI assistant integration | Node.js, Zod, Anthropic SDK |
+| **shared** | Shared types and utilities | TypeScript |
 
 ## Key Features
 
 ### Core Messaging
-- Send and receive messages in conversations
-- Real-time message updates via WebSockets
-- Message threading and replies
-- Emoji reactions to messages
-- Read receipts and message status tracking
+- Send, receive, edit, and delete messages across conversations
+- Real-time updates via WebSockets
+- Message threading, replies, and emoji reactions
+- Read receipts and delivery status tracking
+- Rich text composition with mentions
+- Bulk operations and message search
 
-### Channel Management
-- Unified inbox for all conversations
-- Multi-channel integrations (Gmail, WhatsApp, Instagram, LinkedIn)
-- Conversation archiving and muting
-- Participant management
+### Multi-Channel Integrations
+- **WhatsApp** Business API
+- **Gmail** OAuth + IMAP/SMTP sync
+- **Instagram** Direct Messages
+- **LinkedIn** Messaging
+- Unified inbox with per-channel routing
+
+### AI-Powered Intelligence (Google Gemini)
+- **Sentiment Analysis** with confidence scoring (positive/neutral/negative)
+- **Smart Categorization** by type, urgency, and topic with theme extraction
+- **Reply Suggestions** in multiple tones (professional, casual, empathetic, humorous)
+- **Semantic Search** across messages using AI embeddings
+- **Automatic Analysis** on message creation (configurable)
+- **Async Processing** via Bull queue + Upstash Redis for non-blocking heavy operations
+- **Cost Tracking** with per-user daily/monthly limits and real-time quota enforcement
+
+### MCP Server
+The Model Context Protocol server enables AI assistants (Claude, etc.) to interact with NexusComm programmatically. Available tools:
+
+| Tool | Description |
+|------|-------------|
+| `get_conversations` | List conversations with filters |
+| `get_messages` | Retrieve messages with date range filtering |
+| `send_message` | Send messages to conversations |
+| `search_messages` | Full-text and semantic search |
+| `get_reply_suggestions` | Context-aware reply generation |
+| `get_conversation_insights` | AI-powered conversation analysis |
+| `triage_messages` | Automatic categorization and prioritization |
+| `generate_daily_digest` | AI-summarized communication digest |
+| `set_reminder` | Follow-up reminders with optimal timing |
+| `analyze_conversation_health` | Conversation metrics and health scoring |
+| `file_system` | Secure file operations with path validation |
+| `execute_command` | Sandboxed shell command execution |
+| `watch_files` | Real-time file change detection |
+
+Security: rate limiting (100 req/min), path traversal prevention, command whitelisting, audit logging.
+
+### Business Intelligence & CRM
+- Contact management with deduplication and relationship inference
+- Sales pipeline tracking and opportunity scoring
+- Deal forecasting and revenue analytics
+- Customer interaction history
 
 ### Advanced Features
-- Full-text message search with advanced filtering
-- Message history and pagination
-- Rich text support with mentions
-- Bulk message operations
-- Message analytics and insights
-- Real-time presence and status
+- **Group Management** with roles (admin/moderator/member) and moderation
+- **Smart Scheduling** with AI-optimal send times
+- **Voice Intelligence** with transcription and speaker identification
+- **Rich Media Processing** with OCR and caption generation
+- **Intelligent Notifications** with batching and do-not-disturb scheduling
+- **Cross-Device Sync** with real-time state management
+- **Offline Capabilities** with message queuing and sync-on-reconnect
+- **Accessibility** with text-to-speech, high contrast, keyboard navigation
 
-### AI-Powered Intelligence (Anthropic Claude)
-- **Sentiment Analysis**: Emotional tone detection with positive/neutral/negative scoring + confidence
-- **Smart Categorization**: Auto-tag by type, urgency, topic; extract themes and insights
-- **Reply Suggestions**: Context-aware replies in multiple tones (professional, casual, empathetic, humorous)
-- **Semantic Search**: Intelligent cross-message search using AI embeddings
-- **Automatic Analysis**: Messages auto-analyzed on creation (fully configurable)
-- **Async Processing**: Background job queuing with Bull + Redis for non-blocking operations
-- **Cost Tracking**: Real-time monitoring with per-user quotas, daily/monthly limits, USD tracking
-- **Usage Analytics**: Comprehensive metrics on all AI operations with success/failure tracking
-
-### Security & Quality
-- JWT-based authentication
-- Rate limiting and request validation
-- Comprehensive error handling
-- Input validation with Joi
-- TypeScript throughout the stack
-- Clean/hexagonal architecture with clear separation of concerns
+### Security
+- JWT authentication with refresh tokens
+- Role-based access control
+- Input validation (Joi + Zod)
+- Helmet.js security headers, CORS, bcrypt
+- Encryption at rest and in transit
+- Audit logging and compliance (GDPR-ready)
 
 ## Tech Stack
 
 ### Backend
-- **Runtime**: Node.js 18+
-- **Framework**: Express.js with TypeScript
-- **Database**: PostgreSQL with TypeORM
-- **Real-time**: WebSockets with ws
-- **Caching/Jobs**: Redis with Bull
-- **AI Services**: Anthropic Claude API for sentiment analysis, categorization, suggestions
+- **Runtime**: Node.js 20
+- **Framework**: Express.js + TypeScript
+- **Database**: PostgreSQL 16 with TypeORM
+- **Cache/Queue**: Upstash Redis with Bull
+- **AI**: Google Gemini API
+- **Vector Search**: Weaviate / Pinecone
 - **Security**: JWT, Helmet, CORS, bcrypt
 - **Validation**: Joi
 - **Logging**: Pino
 
 ### Frontend (Web)
-- **Framework**: Next.js 14
-- **UI Library**: React 18
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand
+- **Framework**: Next.js 14 (App Router)
+- **UI**: React 18 + Tailwind CSS + shadcn/ui
+- **State**: Zustand
 - **Real-time**: Socket.IO client
-- **HTTP Client**: Axios
-- **Rich Text**: Quill editor
+- **Rich Text**: React Quill
+- **Animation**: Framer Motion
 
 ### Mobile
 - **Framework**: React Native with Expo
-- **State Management**: Zustand
-- **Real-time**: Socket.IO client
-- **HTTP Client**: Axios
+- **Navigation**: React Navigation
+- **State**: Zustand
+- **Voice**: React Native Voice
+
+### MCP Server
+- **Protocol**: MCP 2024-11-05
+- **Validation**: Zod
+- **AI SDK**: Anthropic Claude SDK
+- **File Watching**: Chokidar
+
+### Infrastructure
+- **Cloud**: GCP Cloud Run (europe-west2)
+- **Registry**: Google Artifact Registry
+- **IaC**: Terraform
+- **CI/CD**: GitHub Actions
+- **Containers**: Docker with multi-stage builds
 
 ## Architecture
 
-The project follows **clean/hexagonal architecture** with **domain-driven design (DDD)** principles:
+The project follows **clean/hexagonal architecture** with **domain-driven design**:
 
-### Layers
-1. **Domain Layer**: Core business logic, entities, and domain services
-2. **Application Layer**: Use cases that orchestrate business operations
-3. **Infrastructure Layer**: Repository adapters, external service integrations
-4. **Presentation Layer**: HTTP controllers and request handlers
+```
+Domain Layer        → Entities, value objects, domain services, ports
+Application Layer   → Use cases orchestrating business operations
+Infrastructure Layer → Repository adapters, external service integrations
+Presentation Layer  → HTTP controllers, WebSocket handlers
+```
 
-### Key Design Patterns
-- **Port/Adapter Pattern**: Domain ports for infrastructure dependencies
-- **Dependency Injection**: Constructor-based DI for loose coupling
-- **Immutable Models**: Domain entities designed for immutability
-- **Repository Pattern**: Data access abstraction
-- **Use Case Pattern**: Business operation orchestration
+Key patterns: Port/Adapter, Repository, Use Case, Dependency Injection, Immutable Models.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed documentation.
 
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- PostgreSQL 13+
-- Redis 6+
-- npm or yarn
+- Node.js 20+
+- PostgreSQL 16+
+- npm
 
 ### Installation
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/nexuscomm.git
+git clone https://github.com/asmeyatsky/nexuscomm.git
 cd nexuscomm
 
-# Install dependencies for all workspaces
-npm install
+# Install all workspace dependencies
+npm install --legacy-peer-deps
 
-# Configure environment variables
+# Configure environment
 cp backend/.env.example backend/.env
-cp web/.env.example web/.env
+# Edit backend/.env with your database URL, API keys, etc.
 
 # Initialize database
 npm --prefix backend run migrate
@@ -127,39 +168,134 @@ npm --prefix backend run migrate
 ### Development
 
 ```bash
-# Start all services in development mode
+# Start all services
 npm run dev
 
-# Or start individual services:
-npm --prefix backend run dev
-npm --prefix web run dev
-npm --prefix mobile run dev
+# Or individually:
+npm --prefix backend run dev    # Backend API on :3001
+npm --prefix web run dev        # Web app on :3000
+npm --prefix mobile run dev     # Expo mobile app
+npm --prefix mcp-server run dev # MCP server
 ```
-
-Services will be available at:
-- Backend API: `http://localhost:3000`
-- Web App: `http://localhost:3001`
-- Mobile: Expo CLI will provide connection info
 
 ### Production Build
 
 ```bash
-# Build all packages
 npm run build
-
-# Start backend server
 npm --prefix backend start
 ```
 
 ## Docker Deployment
 
 ```bash
-# Build and run with Docker Compose
+# Local development with Docker Compose
 docker-compose up -d
 
-# Access the application
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:3001
+# Production deployment to GCP Cloud Run
+./scripts/deploy.sh
+```
+
+The CI/CD pipeline automatically builds, tests, and deploys on push to `master`:
+1. Backend + frontend tests and linting
+2. Security scanning (Trivy)
+3. Docker images pushed to GCP Artifact Registry
+4. Deployed to Cloud Run (europe-west2)
+
+## Project Structure
+
+```
+nexuscomm/
+├── backend/
+│   └── src/
+│       ├── domain/           # Entities, value objects, ports
+│       ├── application/      # Use cases and DTOs
+│       ├── infrastructure/   # Adapters, repositories
+│       ├── controllers/      # HTTP request handlers (27 controllers)
+│       ├── services/         # Business services (25+ services)
+│       ├── integrations/     # WhatsApp, Gmail, Instagram, LinkedIn
+│       ├── models/           # TypeORM entities (18 models)
+│       ├── queue/            # Bull job processors
+│       ├── middleware/       # Auth, rate limiting, validation
+│       ├── routes/           # API route definitions
+│       └── utils/            # Helpers (JWT, WebSocket, etc.)
+├── web/
+│   └── src/
+│       ├── app/              # Next.js pages (chat, auth)
+│       ├── components/       # React components + MCP UI
+│       └── lib/              # Client utilities, stores
+├── mobile/
+│   └── src/
+│       ├── screens/          # Chat, Home, Login, Settings
+│       └── services/         # API, WebSocket, voice, AI
+├── mcp-server/
+│   └── src/
+│       ├── tools/            # MCP tool implementations
+│       └── services/         # NexusComm + local system services
+├── shared/                   # Shared TypeScript types
+├── terraform/                # GCP infrastructure as code
+├── k8s/                      # Kubernetes manifests
+├── scripts/                  # Deployment scripts
+└── .github/workflows/        # CI/CD pipeline
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register user
+- `POST /api/auth/login` - Login
+
+### Messages
+- `POST /api/messages` - Create message
+- `GET /api/messages/:conversationId` - Get conversation messages
+- `PUT /api/messages/:messageId` - Update message
+- `DELETE /api/messages/:messageId` - Delete message
+- `POST /api/messages/:messageId/reactions` - Add reaction
+- `PUT /api/messages/:messageId/read` - Mark as read
+- `GET /api/messages/search` - Search messages
+
+### Conversations
+- `GET /api/conversations` - List conversations
+- `POST /api/conversations` - Create conversation
+- `GET /api/conversations/:id` - Get details
+- `PUT /api/conversations/:id` - Update
+- `PUT /api/conversations/:conversationId/read` - Mark all as read
+
+### AI Analysis (Sync)
+- `POST /api/ai/analyze-sentiment` - Sentiment analysis
+- `POST /api/ai/categorize-message` - Auto-categorization
+- `POST /api/ai/reply-suggestions` - Smart replies
+- `POST /api/ai/search` - Semantic search
+- `GET /api/ai/health` - Service health
+- `GET /api/ai/usage` - Usage metrics and cost tracking
+
+### AI Analysis (Async)
+- `POST /api/ai/analyze-sentiment/async` - Queue sentiment job
+- `POST /api/ai/categorize-message/async` - Queue categorization job
+- `POST /api/ai/reply-suggestions/async` - Queue reply generation job
+- `GET /api/ai/jobs/:jobId` - Check job status
+- `GET /api/queue/stats` - Queue statistics
+
+See [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) for the full reference.
+
+## Environment Variables
+
+### Backend (.env)
+```
+NODE_ENV=development
+PORT=3001
+DATABASE_URL=postgresql://user:password@localhost:5432/nexuscomm
+REDIS_URL=redis://localhost:6379      # or Upstash URL for production
+JWT_SECRET=your_jwt_secret
+CLIENT_URL=http://localhost:3000
+GEMINI_API_KEY=your_gemini_api_key
+WEAVIATE_URL=your_weaviate_url        # optional
+WEAVIATE_API_KEY=your_weaviate_key    # optional
+```
+
+### Web (.env.local)
+```
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_WS_URL=ws://localhost:3001
 ```
 
 ## Testing
@@ -168,206 +304,24 @@ docker-compose up -d
 # Run all tests
 npm run test
 
-# Run specific test suites
+# Individual packages
 npm --prefix backend run test
 npm --prefix web run test
+
+# With coverage
+npm --prefix backend run test:coverage
 ```
 
-## Project Structure
+## Documentation
 
-```
-nexuscomm/
-├── backend/
-│   └── src/
-│       ├── domain/           # Domain layer (entities, services, ports)
-│       ├── application/      # Application layer (use cases)
-│       ├── infrastructure/   # Infrastructure layer (adapters, repositories)
-│       ├── controllers/      # HTTP request handlers
-│       ├── middleware/       # Express middleware
-│       ├── routes/           # API routes
-│       ├── integrations/     # External service integrations
-│       ├── models/           # TypeORM entities
-│       └── utils/            # Utility functions
-├── web/
-│   └── src/
-│       ├── app/              # Next.js app directory
-│       ├── components/       # React components
-│       ├── lib/              # Client-side utilities
-│       └── styles/           # Global styles
-├── mobile/
-│   └── src/                  # React Native source
-├── shared/                   # Shared types and utilities
-└── docs/                     # Documentation
-```
-
-## API Endpoints
-
-### Messages
-- `POST /api/messages` - Create a new message
-- `GET /api/messages/:conversationId` - Get messages in conversation
-- `PUT /api/messages/:messageId` - Update a message
-- `DELETE /api/messages/:messageId` - Delete a message
-- `POST /api/messages/:messageId/reactions` - Add emoji reaction
-- `PUT /api/messages/:messageId/read` - Mark message as read
-- `GET /api/messages/search` - Search messages
-
-### Conversations
-- `GET /api/conversations` - List user conversations
-- `POST /api/conversations` - Create new conversation
-- `GET /api/conversations/:id` - Get conversation details
-- `PUT /api/conversations/:id` - Update conversation
-- `PUT /api/conversations/:conversationId/read` - Mark all as read
-
-### Users
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
-- `GET /api/users/:id` - Get user profile
-- `PUT /api/users/:id` - Update user profile
-
-### AI Analysis (Claude-powered, Sync)
-- `POST /api/ai/analyze-sentiment` - Analyze message sentiment (immediate response)
-- `POST /api/ai/categorize-message` - Auto-categorize message (immediate response)
-- `POST /api/ai/reply-suggestions` - Generate smart replies (immediate response)
-- `POST /api/ai/search` - Semantic search across messages
-- `GET /api/ai/health` - Check AI service availability
-- `GET /api/ai/usage` - Get current usage metrics and cost tracking
-
-### AI Analysis (Claude-powered, Async for heavy operations)
-- `POST /api/ai/analyze-sentiment/async` - Queue sentiment analysis (returns jobId)
-- `POST /api/ai/categorize-message/async` - Queue categorization (returns jobId)
-- `POST /api/ai/reply-suggestions/async` - Queue reply generation (returns jobId)
-- `GET /api/ai/jobs/:jobId` - Check async job status and progress
-- `GET /api/queue/stats` - Get background queue statistics (waiting, active, completed)
-
-For complete API documentation, see [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md).
-
-## Contributing
-
-1. Create a feature branch: `git checkout -b feature/my-feature`
-2. Make your changes following project patterns
-3. Write tests for new functionality
-4. Run linting: `npm run lint`
-5. Commit your changes
-6. Push to your fork and open a Pull Request
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
-
-## Development Guidelines
-
-This project enforces:
-- **Code Quality**: TypeScript strict mode, ESLint, no linting errors
-- **Architecture**: Clean separation of concerns, hexagonal/clean architecture
-- **Testing**: Tests for critical paths and business logic
-- **Type Safety**: Proper typing throughout, no implicit `any`
-- **Documentation**: Complex functions have JSDoc comments
-
-See [CLAUDE.md](CLAUDE.md) for AI assistant guidelines.
-
-## Environment Variables
-
-### Backend (.env)
-```
-NODE_ENV=development
-PORT=3000
-DATABASE_URL=postgresql://user:password@localhost:5432/nexuscomm
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your_jwt_secret
-CLIENT_URL=http://localhost:3001
-ANTHROPIC_API_KEY=your_anthropic_api_key
-```
-
-**Note**: Get your ANTHROPIC_API_KEY from the [Anthropic Console](https://console.anthropic.com)
-
-### Web (.env.local)
-```
-NEXT_PUBLIC_API_URL=http://localhost:3000
-NEXT_PUBLIC_WS_URL=ws://localhost:3000
-```
-
-## Security
-
-- Sensitive data is never committed to the repository
-- All API endpoints validate and sanitize input
-- Rate limiting prevents abuse
-- JWT tokens secure protected endpoints
-- CORS restricts cross-origin requests
-
-For security policy, see [SECURITY.md](SECURITY.md).
-
-## Deployment
-
-The project is containerized and ready for deployment:
-
-```bash
-# Using Docker
-docker build -t nexuscomm-backend backend/
-docker run -p 3000:3000 nexuscomm-backend
-
-# Using Kubernetes (manifests in k8s/)
-kubectl apply -f k8s/
-```
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
-
-## AI & Cost Management Infrastructure
-
-### Cost Tracking & Rate Limiting
-- Per-user daily limits (1,000 requests, 100K tokens, $10/day)
-- Per-user monthly limits (20,000 requests, 1M tokens, $100/month)
-- Real-time quota enforcement with 429 responses
-- Cost estimation based on Anthropic Sonnet pricing
-- Monthly reset automatic on the 1st
-- Disable/enable AI features per user
-
-### Async Job Processing
-- Bull queue + Redis for background processing
-- Exponential backoff retry logic (3 attempts)
-- Job status polling via API
-- Queue statistics and monitoring
-- Automatic cleanup of completed jobs
-- Stalled job detection and logging
-
-### Database Storage
-- `MessageAnalysisResult` - Store sentiment, categorization, themes
-- `UserAIQuota` - Track usage, limits, and rate limiting state
-- `AIUsageLog` - Audit trail of all AI operations with metrics
-- Indexes for fast lookup by user, operation, timestamp
-
-## Roadmap
-
-### Current (v0.2 - In Progress)
-- ✅ Core messaging functionality
-- ✅ Multi-channel integrations
-- ✅ Real-time updates
-- ✅ Message search and filtering
-- ✅ Conversation management
-- ✅ Claude AI-powered intelligence (4 features)
-- ✅ Async job processing with Bull
-- ✅ Cost monitoring and rate limiting
-- ✅ Database persistence for analysis results
-- ✅ Automatic message analysis on creation
-
-### Planned (v0.3)
-- Vector database integration (Pinecone/Weaviate) for semantic search
-- Message scheduling with AI optimal timing
-- Advanced conversation analytics dashboard
-- Additional channel integrations
-- Frontend UI for AI insights and suggestions
-- Webhook support for external integrations
-- Conversation summarization
-
-## Support & Documentation
-
-- **Architecture**: [ARCHITECTURE.md](ARCHITECTURE.md)
-- **Getting Started**: [GETTING_STARTED.md](GETTING_STARTED.md)
-- **API Reference**: [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)
-- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
-- **Development**: [DEVELOPMENT_WORKFLOW.md](DEVELOPMENT_WORKFLOW.md)
+- [Architecture](ARCHITECTURE.md) - System design and layers
+- [API Reference](docs/API_DOCUMENTATION.md) - Complete endpoint documentation
+- [MCP Integration](MCP_IMPLEMENTATION_SUMMARY.md) - MCP server details
+- [Deployment Guide](DEPLOYMENT_GUIDE.md) - Production deployment
+- [Contributing](CONTRIBUTING.md) - Contribution guidelines
+- [Security](SECURITY.md) - Security policies
+- [Development Workflow](DEVELOPMENT_WORKFLOW.md) - Dev standards
 
 ## License
 
-Proprietary License - see [LICENSE](LICENSE) file for details.
-
----
-
-**Made with ❤️ by the NexusComm Team**
+Proprietary - see [LICENSE](LICENSE) for details.
