@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+.git
+.gitignore
+README.md
+*.md
+
+# Build artifacts
+dist
+.next
+coverage
+*.log
+
+# IDE
+.vscode
+.idea
+
+# Tests
+__tests__
+*.test.ts
+*.spec.ts
+
+# Misc
+.DS_Store
+.env*.local

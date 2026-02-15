@@ -1,0 +1,20 @@
+# terraform/terraform.tfvars.example
+# Copy this to terraform/terraform.tfvars and fill in your values
+
+project_id    = "nexuscomm-487512"
+region        = "us-central1"
+environment   = "staging"
+image_tag     = "v1.0.0"
+
+# Database (Neon Postgres)
+database_url = "postgresql://user:password@host.neon.tech/db?sslmode=require"
+
+# Redis (Upstash)
+redis_url = "redis://default:password@host.upstash.io:6379"
+
+# AI Services
+gemini_api_key = "AIzaSy..."
+
+# Optional: Weaviate
+weaviate_url      = ""
+weaviate_api_key  = ""
