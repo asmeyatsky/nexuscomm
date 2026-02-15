@@ -28,17 +28,19 @@ ENV NODE_ENV=production
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./next.config.js
+
+# Create public directory if it doesn't exist (newer Next.js doesn't create it)
+RUN if [ -d "/app/public" ]; then cp -r /app/public ./public; else mkdir -p ./public; fi
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001
+    adduser -S nodejs -u 1001
 
 # Change ownership of app files
-RUN chown -R nextjs:nodejs /app
+RUN chown -R nodejs:nodejs /app
 
-USER nextjs
+USER nodejs
 
 EXPOSE 3001
 

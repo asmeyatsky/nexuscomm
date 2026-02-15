@@ -1,23 +1,4 @@
-# Multi-stage build for NexusComm Backend
-# Stage 1: Build dependencies and application
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies with legacy peer deps flag (for dev dependencies)
-RUN npm install --legacy-peer-deps
-
-# Copy source code
-COPY tsconfig.json ./
-COPY src ./src
-
-# Build TypeScript
-RUN npm run build
-
-# Stage 2: Production runtime
+# Production runtime for NexusComm Backend
 FROM node:20-alpine
 
 WORKDIR /app
@@ -25,18 +6,18 @@ WORKDIR /app
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init curl
 
-# Set environment to production
-ENV NODE_ENV=production
-
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm install --legacy-peer-deps --production=true && \
-    npm cache clean --force
+# Install all dependencies (tsx needed for running TypeScript directly)
+RUN npm install --legacy-peer-deps
 
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
+# Copy source code
+COPY tsconfig.json ./
+COPY src ./src
+
+# Set environment to production
+ENV NODE_ENV=production
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
@@ -58,5 +39,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-# Start application
-CMD ["node", "dist/index.js"]
+# Start application with tsx (runs TypeScript directly)
+CMD ["npx", "tsx", "src/index.ts"]

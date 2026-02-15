@@ -47,8 +47,6 @@ services:
       dockerfile: Dockerfile
     container_name: nexuscomm_backend
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_healthy
     environment:
@@ -56,11 +54,7 @@ services:
       PORT: 3000
       API_URL: ${API_URL:-http://localhost:3000}
       CLIENT_URL: ${CLIENT_URL:-http://localhost:3001}
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: ${DB_USER:-nexuscomm}
-      DB_PASSWORD: ${DB_PASSWORD:-nexuscomm_dev_password}
-      DB_NAME: ${DB_NAME:-nexuscomm_db}
+      DATABASE_URL: ${DATABASE_URL:-}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_password}
@@ -69,9 +63,9 @@ services:
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-dev_refresh_token_secret}
       ENCRYPTION_SECRET: ${ENCRYPTION_SECRET:-dev_encryption_secret_key_32_characters_long}
       ENCRYPTION_IV: ${ENCRYPTION_IV:-dev_iv_16_chars}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      PINECONE_API_KEY: ${PINECONE_API_KEY:-}
-      PINECONE_INDEX: ${PINECONE_INDEX:-nexuscomm-messages}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      WEAVIATE_URL: ${WEAVIATE_URL:-}
+      WEAVIATE_API_KEY: ${WEAVIATE_API_KEY:-}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     ports:
       - "${BACKEND_PORT:-3000}:3000"
@@ -92,9 +86,9 @@ services:
     container_name: nexuscomm_frontend
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:3000}
     ports:
-      - "${FRONTEND_PORT:-3001}:3001"
+      - "8080:3001"
     depends_on:
       - backend
     networks:
