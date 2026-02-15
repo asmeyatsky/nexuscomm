@@ -1,10 +1,9 @@
 import { DataSource, Repository } from 'typeorm';
-import { MessageRepositoryPort } from '../../domain/ports/MessageRepositoryPort';
-import { Message } from '../../domain/entities/Message';
-import { MessageContent } from '../../domain/valueObjects/MessageContent';
-import { Attachment } from '../../domain/valueObjects/Attachment';
-import { Reaction } from '../../domain/valueObjects/Reaction';
-import { Message as MessageEntity } from '../entities/Message'; // The TypeORM entity
+import { MessageRepositoryPort } from '@domain/ports/MessageRepositoryPort';
+import { Message } from '@domain/entities/Message';
+import { MessageContent } from '@domain/valueObjects/MessageContent';
+import { Attachment } from '@domain/valueObjects/Attachment';
+import { Reaction } from '@domain/valueObjects/Reaction';
 
 /**
  * TypeORMMessageRepositoryAdapter
@@ -22,10 +21,10 @@ import { Message as MessageEntity } from '../entities/Message'; // The TypeORM e
  * 4. Maintains transaction boundaries where needed
  */
 export class TypeORMMessageRepositoryAdapter implements MessageRepositoryPort {
-  private repository: Repository<MessageEntity>;
+  private repository: Repository<Message>;
 
   constructor(private dataSource: DataSource) {
-    this.repository = dataSource.getRepository(MessageEntity);
+    this.repository = dataSource.getRepository(Message);
   }
 
   async findById(id: string): Promise<Message | null> {
@@ -135,7 +134,7 @@ export class TypeORMMessageRepositoryAdapter implements MessageRepositoryPort {
     // Update messages to mark them as read
     await this.repository
       .createQueryBuilder()
-      .update(MessageEntity)
+      .update(Message)
       .set({ 
         isRead: true, 
         readAt: new Date() 
@@ -150,7 +149,7 @@ export class TypeORMMessageRepositoryAdapter implements MessageRepositoryPort {
     // Update all messages in the conversation for the user to be marked as read
     await this.repository
       .createQueryBuilder()
-      .update(MessageEntity)
+      .update(Message)
       .set({ 
         isRead: true, 
         readAt: new Date() 
@@ -163,7 +162,7 @@ export class TypeORMMessageRepositoryAdapter implements MessageRepositoryPort {
   /**
    * Transform TypeORM entity to domain entity
    */
-  private toDomain(entity: MessageEntity): Message {
+  private toDomain(entity: Message): Message {
     // Transform content data from JSONB to MessageContent value object
     let content: MessageContent;
     if (typeof entity.contentData === 'object' && entity.contentData !== null) {
@@ -239,8 +238,8 @@ export class TypeORMMessageRepositoryAdapter implements MessageRepositoryPort {
   /**
    * Transform domain entity to TypeORM entity
    */
-  private toTypeORM(domain: Message): MessageEntity {
-    const entity = new MessageEntity();
+  private toTypeORM(domain: Message): Message {
+    const entity = new Message();
     entity.id = domain.id;
     entity.conversationId = domain.conversationId;
     entity.userId = domain.userId;

@@ -18,19 +18,22 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "baseUrl": ".",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
       "@/*": ["src/*"],
+      "@application/*": ["src/application/*"],
       "@config/*": ["src/config/*"],
-      "@models/*": ["src/models/*"],
       "@controllers/*": ["src/controllers/*"],
+      "@domain/*": ["src/domain/*"],
+      "@infrastructure/*": ["src/infrastructure/*"],
+      "@middleware/*": ["src/middleware/*"],
+      "@models/*": ["src/models/*"],
+      "@queue/*": ["src/queue/*"],
       "@routes/*": ["src/routes/*"],
       "@services/*": ["src/services/*"],
-      "@middleware/*": ["src/middleware/*"],
-      "@utils/*": ["src/utils/*"],
       "@types/*": ["src/types/*"],
-      "@infrastructure/*": ["src/infrastructure/*"],
-      "@domain/*": ["src/domain/*"],
-      "@application/*": ["src/application/*"]
+      "@utils/*": ["src/utils/*"]
     }
   },
   "include": ["src/**/*"],

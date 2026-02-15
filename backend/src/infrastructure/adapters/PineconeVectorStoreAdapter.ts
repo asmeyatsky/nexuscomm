@@ -6,7 +6,7 @@
 
 import { Pinecone } from '@pinecone-database/pinecone';
 import pino from 'pino';
-import { encoding_for_model } from 'js-tiktoken';
+import { encodingForModel } from 'js-tiktoken';
 
 export interface VectorEmbedding {
   id: string;
@@ -34,7 +34,7 @@ export class PineconeVectorStoreAdapter {
   private client: Pinecone;
   private indexName: string;
   private logger: pino.Logger;
-  private tokenizer = encoding_for_model('gpt-3.5-turbo');
+  private tokenizer = encodingForModel('gpt-3.5-turbo');
   private readonly EMBEDDING_DIM = 1536; // Pinecone default for text-embedding-3-small
 
   constructor(

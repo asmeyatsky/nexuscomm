@@ -318,8 +318,8 @@ router.get('/ai/queue/stats', authenticateToken, AIAsyncController.getQueueStats
 // Advanced AI Analysis routes (summarization, scheduling, insights)
 const aiAdvancedController = new AIAdvancedController(
   diConfig.getSummarizeConversationUseCase(),
-  diConfig.getSmartScheduleRecommendationUseCase(),
-  diConfig.getConversationAnalysisInsightsUseCase(),
+  diConfig.getSmartScheduleRecommendation(),
+  diConfig.getConversationAnalysisInsights(),
 );
 
 router.post(

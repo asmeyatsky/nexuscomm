@@ -1,5 +1,5 @@
 import { AppDataSource } from '@config/database';
-import { Contact } from '@models/Contact'; // Assuming Contact model exists or will be created
+import { Contact } from '@models/Contact';
 import { Conversation } from '@models/Conversation';
 import { Message } from '@models/Message';
 import { AppError } from '@middleware/errorHandler';

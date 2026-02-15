@@ -1,32 +1,32 @@
 import { AppDataSource } from '@config/database';
-import { MessageDomainService } from '../domain/services/MessageDomainService';
-import { ConversationDomainService } from '../domain/services/ConversationDomainService';
-import { UserDomainService } from '../domain/services/UserDomainService';
-import { TypeORMMessageRepositoryAdapter } from '../infrastructure/repositories/TypeORMMessageRepositoryAdapter';
-import { TypeORMConversationRepositoryAdapter } from '../infrastructure/repositories/TypeORMConversationRepositoryAdapter';
-import { TypeORMUserRepositoryAdapter } from '../infrastructure/repositories/TypeORMUserRepositoryAdapter';
-import { CreateMessageUseCase } from './use_cases/CreateMessageUseCase';
-import { UpdateMessageUseCase } from './use_cases/UpdateMessageUseCase';
-import { DeleteMessageUseCase } from './use_cases/DeleteMessageUseCase';
-import { AddReactionUseCase } from './use_cases/AddReactionUseCase';
-import { GetMessageHistoryUseCase, SearchMessagesUseCase, GetMessageByIdUseCase } from './use_cases/GetMessageUseCases';
-import { MarkMessagesAsReadUseCase } from './use_cases/MarkMessagesAsReadUseCase';
-import { MarkIndividualMessageAsReadUseCase } from './use_cases/MarkIndividualMessageAsReadUseCase';
+import { MessageDomainService } from '@domain/services/MessageDomainService';
+import { ConversationDomainService } from '@domain/services/ConversationDomainService';
+import { UserDomainService } from '@domain/services/UserDomainService';
+import { TypeORMMessageRepositoryAdapter } from '@infrastructure/repositories/TypeORMMessageRepositoryAdapter';
+import { TypeORMConversationRepositoryAdapter } from '@infrastructure/repositories/TypeORMConversationRepositoryAdapter';
+import { TypeORMUserRepositoryAdapter } from '@infrastructure/repositories/TypeORMUserRepositoryAdapter';
+import { CreateMessageUseCase } from '@application/use_cases/CreateMessageUseCase';
+import { UpdateMessageUseCase } from '@application/use_cases/UpdateMessageUseCase';
+import { DeleteMessageUseCase } from '@application/use_cases/DeleteMessageUseCase';
+import { AddReactionUseCase } from '@application/use_cases/AddReactionUseCase';
+import { GetMessageHistoryUseCase, SearchMessagesUseCase, GetMessageByIdUseCase } from '@application/use_cases/GetMessageUseCases';
+import { MarkMessagesAsReadUseCase } from '@application/use_cases/MarkMessagesAsReadUseCase';
+import { MarkIndividualMessageAsReadUseCase } from '@application/use_cases/MarkIndividualMessageAsReadUseCase';
 import {
   SendMessageWithMentionsUseCase,
   SendMessageWithRichTextUseCase,
   GetThreadMessagesUseCase,
   GetMessageAnalyticsUseCase,
   BulkMarkMessagesUseCase
-} from './use_cases/AdvancedMessagingUseCases';
+} from '@application/use_cases/AdvancedMessagingUseCases';
 import {
   AdvancedMessageSearchUseCase,
   GetMessageContextUseCase,
   GetConversationInsightsUseCase,
   GetMessageTrendsUseCase
-} from './use_cases/SearchIntelligenceUseCases';
-import { CreateConversationUseCase, AddParticipantUseCase, RemoveParticipantUseCase, ManageConversationUseCase, GetConversationsUseCase } from './use_cases/ConversationUseCases';
-import { CreateUserUseCase, UpdateUserStatusUseCase, UpdateUserOnlineStatusUseCase, UpdateUserProfileUseCase } from './use_cases/UserUseCases';
+} from '@application/use_cases/SearchIntelligenceUseCases';
+import { CreateConversationUseCase, AddParticipantUseCase, RemoveParticipantUseCase, ManageConversationUseCase, GetConversationsUseCase } from '@application/use_cases/ConversationUseCases';
+import { CreateUserUseCase, UpdateUserStatusUseCase, UpdateUserOnlineStatusUseCase, UpdateUserProfileUseCase } from '@application/use_cases/UserUseCases';
 import { AnalyzeSentimentUseCase } from '@application/use_cases/AnalyzeSentimentUseCase';
 import { CategorizeMessageUseCase } from '@application/use_cases/CategorizeMessageUseCase';
 import { GenerateReplySuggestionsUseCase } from '@application/use_cases/GenerateReplySuggestionsUseCase';
@@ -305,11 +305,11 @@ export class DependencyInjectionConfig {
     return this.summarizeConversationUseCase;
   }
 
-  public getSmartScheduleRecommendationUseCase(): GetSmartScheduleRecommendationUseCase {
+  public getSmartScheduleRecommendation(): GetSmartScheduleRecommendationUseCase {
     return this.getSmartScheduleRecommendationUseCase;
   }
 
-  public getConversationAnalysisInsightsUseCase(): AnalysisInsightsUseCase {
+  public getConversationAnalysisInsights(): AnalysisInsightsUseCase {
     return this.getConversationAnalysisInsightsUseCase;
   }
 }

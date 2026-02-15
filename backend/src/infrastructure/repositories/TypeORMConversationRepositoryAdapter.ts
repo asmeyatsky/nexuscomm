@@ -1,7 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
-import { ConversationRepositoryPort } from '../../domain/ports/ConversationRepositoryPort';
-import { Conversation } from '../../domain/valueObjects/Conversation';
-import { Conversation as ConversationEntity } from '../entities/Conversation'; // The TypeORM entity
+import { ConversationRepositoryPort } from '@domain/ports/ConversationRepositoryPort';
+import { Conversation } from '@domain/valueObjects/Conversation';
 
 /**
  * TypeORMConversationRepositoryAdapter
@@ -19,10 +18,10 @@ import { Conversation as ConversationEntity } from '../entities/Conversation'; /
  * 4. Maintains transaction boundaries where needed
  */
 export class TypeORMConversationRepositoryAdapter implements ConversationRepositoryPort {
-  private repository: Repository<ConversationEntity>;
+  private repository: Repository<Conversation>;
 
   constructor(private dataSource: DataSource) {
-    this.repository = dataSource.getRepository(ConversationEntity);
+    this.repository = dataSource.getRepository(Conversation);
   }
 
   async findById(id: string): Promise<Conversation | null> {
@@ -126,7 +125,7 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
   async updateLastMessageAt(conversationId: string, timestamp: Date): Promise<Conversation> {
     const result = await this.repository
       .createQueryBuilder()
-      .update(ConversationEntity)
+      .update(Conversation)
       .set({ lastMessageAt: timestamp, updatedAt: new Date() })
       .where('id = :conversationId', { conversationId })
       .returning('*')
@@ -148,7 +147,7 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
   async updateUnreadCount(conversationId: string, count: number): Promise<Conversation> {
     const result = await this.repository
       .createQueryBuilder()
-      .update(ConversationEntity)
+      .update(Conversation)
       .set({ unreadCount: count, updatedAt: new Date() })
       .where('id = :conversationId', { conversationId })
       .returning('*')
@@ -170,7 +169,7 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
   /**
    * Transform TypeORM entity to domain entity
    */
-  private toDomain(entity: ConversationEntity): Conversation {
+  private toDomain(entity: Conversation): Conversation {
     return new Conversation({
       id: entity.id,
       name: entity.name,
@@ -189,8 +188,8 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
   /**
    * Transform domain entity to TypeORM entity
    */
-  private toTypeORM(domain: Conversation): ConversationEntity {
-    const entity = new ConversationEntity();
+  private toTypeORM(domain: Conversation): Conversation {
+    const entity = new Conversation();
     entity.id = domain.id;
     entity.name = domain.name;
     entity.type = domain.type;

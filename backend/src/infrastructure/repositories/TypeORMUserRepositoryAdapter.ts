@@ -1,7 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
-import { UserRepositoryPort } from '../../domain/ports/UserRepositoryPort';
-import { User } from '../../domain/valueObjects/User';
-import { User as UserEntity } from '../entities/User'; // The TypeORM entity
+import { UserRepositoryPort } from '@domain/ports/UserRepositoryPort';
+import { User } from '@domain/valueObjects/User';
 
 /**
  * TypeORMUserRepositoryAdapter
@@ -19,10 +18,10 @@ import { User as UserEntity } from '../entities/User'; // The TypeORM entity
  * 4. Maintains transaction boundaries where needed
  */
 export class TypeORMUserRepositoryAdapter implements UserRepositoryPort {
-  private repository: Repository<UserEntity>;
+  private repository: Repository<User>;
 
   constructor(private dataSource: DataSource) {
-    this.repository = dataSource.getRepository(UserEntity);
+    this.repository = dataSource.getRepository(User);
   }
 
   async findById(id: string): Promise<User | null> {
@@ -75,7 +74,7 @@ export class TypeORMUserRepositoryAdapter implements UserRepositoryPort {
   }
 
   async updateOnlineStatus(userId: string, isOnline: boolean, lastSeen?: Date): Promise<User> {
-    const updateData: Partial<UserEntity> = {
+    const updateData: Partial<User> = {
       isOnline,
       updatedAt: new Date(),
     };
@@ -86,7 +85,7 @@ export class TypeORMUserRepositoryAdapter implements UserRepositoryPort {
 
     const result = await this.repository
       .createQueryBuilder()
-      .update(UserEntity)
+      .update(User)
       .set(updateData)
       .where('id = :userId', { userId })
       .returning('*')
@@ -106,7 +105,7 @@ export class TypeORMUserRepositoryAdapter implements UserRepositoryPort {
   }
 
   async updateStatus(userId: string, status: string, statusEmoji?: string): Promise<User> {
-    const updateData: Partial<UserEntity> = {
+    const updateData: Partial<User> = {
       status,
       statusEmoji,
       updatedAt: new Date(),
@@ -114,7 +113,7 @@ export class TypeORMUserRepositoryAdapter implements UserRepositoryPort {
 
     const result = await this.repository
       .createQueryBuilder()
-      .update(UserEntity)
+      .update(User)
       .set(updateData)
       .where('id = :userId', { userId })
       .returning('*')
@@ -136,7 +135,7 @@ export class TypeORMUserRepositoryAdapter implements UserRepositoryPort {
   /**
    * Transform TypeORM entity to domain entity
    */
-  private toDomain(entity: UserEntity): User {
+  private toDomain(entity: User): User {
     return new User({
       id: entity.id,
       externalId: entity.externalId,
@@ -153,8 +152,8 @@ export class TypeORMUserRepositoryAdapter implements UserRepositoryPort {
   /**
    * Transform domain entity to TypeORM entity
    */
-  private toTypeORM(domain: User): UserEntity {
-    const entity = new UserEntity();
+  private toTypeORM(domain: User): User {
+    const entity = new User();
     entity.id = domain.id;
     entity.externalId = domain.externalId;
     entity.name = domain.name;
