@@ -25,10 +25,7 @@ resource "google_cloud_run_v2_service" "backend" {
         name  = "NODE_ENV"
         value = "production"
       }
-      env {
-        name  = "PORT"
-        value = "3000"
-      }
+
       env {
         name  = "DATABASE_URL"
         value = var.database_url
@@ -51,7 +48,7 @@ resource "google_cloud_run_v2_service" "backend" {
       }
       env {
         name  = "CLIENT_URL"
-        value = google_cloud_run_v2_service.frontend.uri
+        value = "https://nexuscomm-frontend-${var.region}.a.run.app"
       }
 
       resources {
@@ -63,11 +60,6 @@ resource "google_cloud_run_v2_service" "backend" {
     }
 
     service_account = google_service_account.nexuscomm.email
-  }
-
-  traffic {
-    percent         = 100
-    latest_revision = true
   }
 }
 
@@ -82,7 +74,7 @@ resource "google_cloud_run_v2_service" "frontend" {
 
       env {
         name  = "NEXT_PUBLIC_API_URL"
-        value = "${google_cloud_run_v2_service.backend.uri}/api"
+        value = "https://nexuscomm-backend-${var.region}.a.run.app/api"
       }
 
       resources {
@@ -95,11 +87,6 @@ resource "google_cloud_run_v2_service" "frontend" {
 
     service_account = google_service_account.nexuscomm.email
   }
-
-  traffic {
-    percent         = 100
-    latest_revision = true
-  }
 }
 
 # Allow public access to Cloud Run services
@@ -110,16 +97,16 @@ data "google_iam_policy" "noauth" {
   }
 }
 
-resource "google_cloud_run_v2_service_iam_policy" "backend_noauth" {
-  location    = google_cloud_run_v2_service.backend.location
-  project     = google_cloud_run_v2_service.backend.project
+resource "google_cloud_run_service_iam_policy" "backend_noauth" {
+  location    = var.region
+  project     = var.project_id
   service     = google_cloud_run_v2_service.backend.name
   policy_data = data.google_iam_policy.noauth.policy_data
 }
 
-resource "google_cloud_run_v2_service_iam_policy" "frontend_noauth" {
-  location    = google_cloud_run_v2_service.frontend.location
-  project     = google_cloud_run_v2_service.frontend.project
+resource "google_cloud_run_service_iam_policy" "frontend_noauth" {
+  location    = var.region
+  project     = var.project_id
   service     = google_cloud_run_v2_service.frontend.name
   policy_data = data.google_iam_policy.noauth.policy_data
 }
