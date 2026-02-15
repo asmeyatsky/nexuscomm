@@ -39,10 +39,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm --prefix backend install --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
       - name: Run linting
         run: npm --prefix backend run lint
@@ -76,10 +76,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm --prefix web install --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
       - name: Run linting
         run: npm --prefix web run lint
