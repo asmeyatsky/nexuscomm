@@ -24,7 +24,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#3b82f6" />
       </head>
-      <body className="bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50">
+      <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ToastProvider>{children}</ToastProvider>
         </ThemeProvider>
