@@ -24,10 +24,10 @@ export class ConversationSummaryResult {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'uuid' })
   conversationId: string;
 
-  @Column()
+  @Column({ type: 'uuid' })
   userId: string; // User who requested summary
 
   @Column('simple-array')

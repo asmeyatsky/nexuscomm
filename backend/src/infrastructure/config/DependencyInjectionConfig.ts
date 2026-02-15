@@ -32,6 +32,7 @@ import { CategorizeMessageUseCase } from '@application/use_cases/CategorizeMessa
 import { GenerateReplySuggestionsUseCase } from '@application/use_cases/GenerateReplySuggestionsUseCase';
 import { SemanticSearchUseCase } from '@application/use_cases/SemanticSearchUseCase';
 import { ClaudeAIServiceAdapter } from '@infrastructure/adapters/ClaudeAIServiceAdapter';
+import { GeminiAIServiceAdapter } from '@infrastructure/adapters/GeminiAIServiceAdapter';
 import { AIAnalysisPort } from '@domain/ports/AIAnalysisPort';
 import { SummarizeConversationUseCase } from '@application/use_cases/SummarizeConversationUseCase';
 import { GetSmartScheduleRecommendationUseCase } from '@application/use_cases/GetSmartScheduleRecommendationUseCase';
@@ -142,26 +143,45 @@ export class DependencyInjectionConfig {
     this.updateUserOnlineStatusUseCase = new UpdateUserOnlineStatusUseCase(this.userDomainService);
     this.updateUserProfileUseCase = new UpdateUserProfileUseCase(this.userDomainService);
 
-    // Initialize AI analysis services
-    this.aiAnalysisPort = new ClaudeAIServiceAdapter(
-      process.env.ANTHROPIC_API_KEY,
-      process.env.PINECONE_API_KEY,
-      process.env.PINECONE_INDEX || 'nexuscomm-messages',
-    );
-    this.analyzeSentimentUseCase = new AnalyzeSentimentUseCase(this.aiAnalysisPort);
-    this.categorizeMessageUseCase = new CategorizeMessageUseCase(this.aiAnalysisPort);
-    this.generateReplySuggestionsUseCase = new GenerateReplySuggestionsUseCase(this.aiAnalysisPort);
-    this.semanticSearchUseCase = new SemanticSearchUseCase(this.aiAnalysisPort);
-
-    // Initialize advanced AI services
-    this.aiAdvancedPort = new ClaudeAdvancedAIAdapter(process.env.ANTHROPIC_API_KEY);
-    this.summarizeConversationUseCase = new SummarizeConversationUseCase(this.aiAdvancedPort);
-    this.getSmartScheduleRecommendationUseCase = new GetSmartScheduleRecommendationUseCase(
-      this.aiAdvancedPort,
-    );
-    this.getConversationAnalysisInsightsUseCase = new AnalysisInsightsUseCase(
-      this.aiAdvancedPort,
-    );
+    // Initialize AI analysis services - use Gemini if GEMINI_API_KEY is set
+    const geminiKey = process.env.GEMINI_API_KEY;
+    const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    const pineconeKey = process.env.PINECONE_API_KEY;
+    
+    if (geminiKey) {
+      console.log('🤖 Using Gemini for AI features (no vector DB required)');
+      this.aiAnalysisPort = new GeminiAIServiceAdapter(geminiKey);
+    } else if (anthropicKey && pineconeKey) {
+      this.aiAnalysisPort = new ClaudeAIServiceAdapter(
+        anthropicKey,
+        pineconeKey,
+        process.env.PINECONE_INDEX || 'nexuscomm-messages',
+      );
+      this.aiAdvancedPort = new ClaudeAdvancedAIAdapter(anthropicKey);
+    } else if (anthropicKey) {
+      console.warn('⚠️  ANTHROPIC_API_KEY set but PINECONE_API_KEY missing - AI features limited');
+    } else {
+      console.warn('⚠️  No AI API key configured - AI features disabled');
+      console.warn('   Set GEMINI_API_KEY or ANTHROPIC_API_KEY+PINECONE_API_KEY');
+    }
+    
+    // Only initialize use cases if we have a working AI adapter
+    if (this.aiAnalysisPort && typeof this.aiAnalysisPort.analyzeSentiment === 'function') {
+      this.analyzeSentimentUseCase = new AnalyzeSentimentUseCase(this.aiAnalysisPort);
+      this.categorizeMessageUseCase = new CategorizeMessageUseCase(this.aiAnalysisPort);
+      this.generateReplySuggestionsUseCase = new GenerateReplySuggestionsUseCase(this.aiAnalysisPort);
+      this.semanticSearchUseCase = new SemanticSearchUseCase(this.aiAnalysisPort);
+      
+      if (this.aiAdvancedPort && typeof (this.aiAdvancedPort as { summarizeConversation?: unknown }).summarizeConversation === 'function') {
+        this.summarizeConversationUseCase = new SummarizeConversationUseCase(this.aiAdvancedPort);
+        this.getSmartScheduleRecommendationUseCase = new GetSmartScheduleRecommendationUseCase(
+          this.aiAdvancedPort,
+        );
+        this.getConversationAnalysisInsightsUseCase = new AnalysisInsightsUseCase(
+          this.aiAdvancedPort,
+        );
+      }
+    }
   }
 
   // Message use cases

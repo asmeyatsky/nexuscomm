@@ -25,10 +25,10 @@ export class ScheduledMessage {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'uuid' })
   conversationId: string;
 
-  @Column()
+  @Column({ type: 'uuid' })
   userId: string; // User who will send the message
 
   @Column('text')

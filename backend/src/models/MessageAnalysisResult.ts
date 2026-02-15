@@ -30,6 +30,9 @@ export class MessageAnalysisResult {
   @Column({ type: 'uuid' })
   userId: string;
 
+  @CreateDateColumn()
+  createdAt: Date;
+
   // Sentiment Analysis
   @Column({ type: 'float' })
   sentimentPositive: number; // 0-1
