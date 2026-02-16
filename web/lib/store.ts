@@ -60,23 +60,33 @@ export const useAuthStore = create<AuthState>()(
 export interface Conversation {
   id: string;
   participantNames: string[];
+  participantIds: string[];
+  channels: string[];
   lastMessage?: string;
+  lastMessageDirection?: 'inbound' | 'outbound';
+  lastMessageTimestamp?: string;
   unreadCount: number;
-  lastMessageTimestamp?: Date;
+  isPinned: boolean;
+  isMuted: boolean;
+  isArchived: boolean;
 }
 
 export interface ConversationState {
   conversations: Conversation[];
   selectedId: string | null;
+  isLoading: boolean;
   setConversations: (conversations: Conversation[]) => void;
   selectConversation: (id: string) => void;
+  setLoading: (loading: boolean) => void;
 }
 
 export const useConversationStore = create<ConversationState>((set) => ({
   conversations: [],
   selectedId: null,
+  isLoading: false,
   setConversations: (conversations) => set({ conversations }),
   selectConversation: (id) => set({ selectedId: id }),
+  setLoading: (isLoading) => set({ isLoading }),
 }));
 
 // Theme Store
