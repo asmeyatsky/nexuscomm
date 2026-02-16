@@ -3,10 +3,16 @@ import { asyncHandler } from '@middleware/errorHandler';
 import { VoiceProcessingService } from '@services/VoiceProcessingService';
 import { EmailProcessingService } from '@services/EmailProcessingService';
 import { MessageService } from '@services/MessageService';
+import { AccountService } from '@services/AccountService';
+import { ChannelSyncService } from '@services/ChannelSyncService';
+import pino from 'pino';
 
+const logger = pino({ name: 'MessageProcessingController' });
 const voiceProcessingService = new VoiceProcessingService();
 const emailProcessingService = new EmailProcessingService();
 const messageService = new MessageService();
+const accountService = new AccountService();
+const channelSyncService = new ChannelSyncService();
 
 export const processVoiceMessage = asyncHandler(async (req: Request, res: Response) => {
   const { conversationId, voiceContent, targetPlatform, mediaUrls } = req.body;
@@ -122,20 +128,52 @@ export const createMessage = asyncHandler(async (req: Request, res: Response) =>
     // platform selection algorithm that considers user's connected accounts
   }
 
+  const senderAccountId = req.body.senderAccountId;
+  const recipientExternalId = req.body.recipientExternalId;
+
   const message = await messageService.createMessage(req.userId!, {
     conversationId,
     content,
-    channelType: finalChannelType || 'whatsapp', // Default to whatsapp if not specified
+    channelType: finalChannelType || 'whatsapp',
     direction: 'outbound',
     senderExternalId: req.userId!,
-    senderName: 'User', // Would be replaced with actual user name
+    senderName: 'User',
     externalId: `msg-${Date.now()}`,
     mediaUrls: mediaUrls || [],
+    senderAccountId,
     metadata: {
       source: req.body.source || 'app',
       autoSelectedPlatform: autoSelectPlatform
     }
   });
+
+  // If a sender account is specified, route through the provider integration
+  if (senderAccountId && recipientExternalId) {
+    // Deliver via integration in background so API responds immediately
+    (async () => {
+      try {
+        const account = await accountService.getAccountById(senderAccountId, req.userId!);
+        if (!account || !account.accessToken) {
+          logger.warn({ senderAccountId }, 'Cannot route outbound — account not found or no token');
+          return;
+        }
+
+        const integration = channelSyncService.createIntegration(account);
+        await integration.sendMessage(recipientExternalId, content, mediaUrls);
+
+        // Update message status to sent
+        await messageService.updateMessageStatus(message.id, req.userId!, 'sent');
+        logger.info({ messageId: message.id, senderAccountId }, 'Outbound message delivered via integration');
+      } catch (error) {
+        logger.error({ messageId: message.id, error }, 'Failed to deliver outbound message via integration');
+        try {
+          await messageService.updateMessageStatus(message.id, req.userId!, 'failed');
+        } catch (statusError) {
+          logger.error({ messageId: message.id, statusError }, 'Failed to update message status to failed');
+        }
+      }
+    })();
+  }
 
   res.status(201).json({
     success: true,

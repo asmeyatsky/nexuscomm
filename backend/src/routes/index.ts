@@ -25,6 +25,7 @@ import * as IdentityFilterController from '@controllers/IdentityFilterController
 import * as AIAnalysisController from '@controllers/AIAnalysisController';
 import * as AIAsyncController from '@controllers/AIAsyncController';
 import { AIAdvancedController } from '@controllers/AIAdvancedController';
+import * as ChannelWebhookController from '@controllers/ChannelWebhookController';
 import diConfig from '@infrastructure/config/DependencyInjectionConfig';
 
 const router = Router();
@@ -346,5 +347,11 @@ router.get(
   aiRateLimit,
   (req, res) => aiAdvancedController.getConversationHealth(req, res),
 );
+
+// Channel Webhook routes (public — no auth required)
+router.get('/webhooks/channel/whatsapp', ChannelWebhookController.verifyWhatsAppWebhook);
+router.post('/webhooks/channel/whatsapp', ChannelWebhookController.handleWhatsAppWebhook);
+router.post('/webhooks/channel/instagram', ChannelWebhookController.handleInstagramWebhook);
+router.post('/webhooks/channel/linkedin', ChannelWebhookController.handleLinkedInWebhook);
 
 export default router;

@@ -1,11 +1,20 @@
 import { Request, Response } from 'express';
 import { AccountService } from '@services/AccountService';
+import { ChannelSyncService } from '@services/ChannelSyncService';
 import { asyncHandler } from '@middleware/errorHandler';
+import pino from 'pino';
 
+const logger = pino({ name: 'AccountController' });
 const accountService = new AccountService();
+const channelSyncService = new ChannelSyncService();
 
 export const addAccount = asyncHandler(async (req: Request, res: Response) => {
   const account = await accountService.addAccount(req.userId!, req.body);
+
+  // Trigger initial sync in the background (non-blocking)
+  channelSyncService.triggerInitialSync(account.id, req.userId!).catch((error) => {
+    logger.error({ accountId: account.id, error }, 'Background sync failed');
+  });
 
   res.status(201).json({
     success: true,

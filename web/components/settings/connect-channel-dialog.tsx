@@ -31,7 +31,7 @@ export function ConnectChannelDialog({
   const [selectedChannel, setSelectedChannel] = useState<ChannelType | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [identifier, setIdentifier] = useState('');
-  const [accessToken, setAccessToken] = useState('');
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +39,7 @@ export function ConnectChannelDialog({
     setSelectedChannel(null);
     setDisplayName('');
     setIdentifier('');
-    setAccessToken('');
+    setFieldValues({});
     setIsSubmitting(false);
     setError(null);
   };
@@ -51,22 +51,51 @@ export function ConnectChannelDialog({
     onOpenChange(nextOpen);
   };
 
+  const handleFieldChange = (key: string, value: string) => {
+    setFieldValues((prev) => ({ ...prev, [key]: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedChannel || !identifier.trim()) return;
+
+    const config = CHANNEL_CONFIG[selectedChannel];
+
+    // Validate required fields
+    for (const field of config.fields) {
+      if (field.required && !fieldValues[field.key]?.trim()) {
+        setError(`${field.label} is required`);
+        return;
+      }
+    }
 
     setIsSubmitting(true);
     setError(null);
 
     try {
+      // Separate accessToken from metadata fields
+      const accessToken = fieldValues['accessToken']?.trim();
+      const metadata: Record<string, unknown> = {};
+      for (const field of config.fields) {
+        if (field.key !== 'accessToken' && fieldValues[field.key]?.trim()) {
+          metadata[field.key] = fieldValues[field.key].trim();
+        }
+      }
+
       const payload: ConnectAccountPayload = {
         channelType: selectedChannel,
         identifier: identifier.trim(),
-        displayName: displayName.trim() || CHANNEL_CONFIG[selectedChannel].displayName,
+        displayName: displayName.trim() || config.displayName,
       };
-      if (accessToken.trim()) {
-        payload.accessToken = accessToken.trim();
+
+      if (accessToken) {
+        payload.accessToken = accessToken;
       }
+
+      if (Object.keys(metadata).length > 0) {
+        payload.metadata = metadata;
+      }
+
       await onConnect(payload);
       handleOpenChange(false);
     } catch (err) {
@@ -100,11 +129,19 @@ export function ConnectChannelDialog({
               return (
                 <button
                   key={type}
-                  onClick={() => setSelectedChannel(type)}
-                  className="flex flex-col items-center gap-1 rounded-lg border p-3 hover:bg-accent transition-colors"
+                  onClick={() => ch.supported && setSelectedChannel(type)}
+                  disabled={!ch.supported}
+                  className={`flex flex-col items-center gap-1 rounded-lg border p-3 transition-colors ${
+                    ch.supported
+                      ? 'hover:bg-accent cursor-pointer'
+                      : 'opacity-50 cursor-not-allowed'
+                  }`}
                 >
                   <span className="text-2xl">{ch.icon}</span>
                   <span className="text-xs font-medium">{ch.displayName}</span>
+                  {!ch.supported && (
+                    <span className="text-[10px] text-muted-foreground">Coming soon</span>
+                  )}
                 </button>
               );
             })}
@@ -132,16 +169,24 @@ export function ConnectChannelDialog({
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="accessToken">Access Token (optional)</Label>
-              <Input
-                id="accessToken"
-                type="password"
-                placeholder="Paste token here"
-                value={accessToken}
-                onChange={(e) => setAccessToken(e.target.value)}
-              />
-            </div>
+            {config!.fields.map((field) => (
+              <div key={field.key} className="space-y-2">
+                <Label htmlFor={field.key}>
+                  {field.label}
+                  {!field.required && (
+                    <span className="text-muted-foreground ml-1 text-xs">(optional)</span>
+                  )}
+                </Label>
+                <Input
+                  id={field.key}
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  value={fieldValues[field.key] || ''}
+                  onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                  required={field.required}
+                />
+              </div>
+            ))}
 
             {error && (
               <p className="text-sm text-destructive">{error}</p>
@@ -151,7 +196,10 @@ export function ConnectChannelDialog({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setSelectedChannel(null)}
+                onClick={() => {
+                  setSelectedChannel(null);
+                  setFieldValues({});
+                }}
               >
                 Back
               </Button>
