@@ -1,7 +1,8 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { useAuthStore } from './store';
 
-const API_URL = '/api';
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/nexuscom-staging';
+const API_URL = `${BASE_PATH}/api`;
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_URL,
@@ -38,7 +39,7 @@ apiClient.interceptors.response.use(
         // Refresh token logic here
         const { logout } = useAuthStore.getState();
         logout();
-        window.location.href = '/auth/login';
+        window.location.href = `${BASE_PATH}/auth/login`;
       } catch (err) {
         return Promise.reject(err);
       }

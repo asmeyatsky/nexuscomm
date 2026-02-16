@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  basePath: '/nexuscom-staging',
   reactStrictMode: true,
   images: {
     remotePatterns: [
