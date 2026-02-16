@@ -12,7 +12,8 @@
     "test:coverage": "vitest --coverage",
     "lint": "eslint src --ext .ts",
     "migrate": "tsx src/database/migrate.ts",
-    "db:reset": "tsx src/database/reset.ts"
+    "db:reset": "tsx src/database/reset.ts",
+    "seed:demo": "tsx src/database/seed-demo.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.3",
