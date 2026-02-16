@@ -84,7 +84,31 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
+            {/* Demo credentials */}
+            <div className="mt-4 p-3 rounded-lg bg-muted/50 border border-border">
+              <p className="text-xs font-medium text-muted-foreground mb-1.5">Demo account</p>
+              <div className="flex items-center justify-between">
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Email: </span>
+                  <code className="text-foreground font-mono text-xs bg-muted px-1 py-0.5 rounded">demo@nexuscomm.app</code>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-1">
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Password: </span>
+                  <code className="text-foreground font-mono text-xs bg-muted px-1 py-0.5 rounded">demo1234</code>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setEmail('demo@nexuscomm.app'); setPassword('demo1234'); }}
+                className="mt-2 text-xs text-primary hover:underline font-medium"
+              >
+                Fill demo credentials
+              </button>
+            </div>
+
+            <div className="mt-4 text-center">
               <p className="text-sm text-muted-foreground">
                 Don&apos;t have an account?{' '}
                 <Link href="/auth/signup" className="text-primary hover:underline font-medium">

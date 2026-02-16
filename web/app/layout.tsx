@@ -5,7 +5,34 @@ import { ToastProvider } from '@/lib/toast-provider';
 
 export const metadata: Metadata = {
   title: 'NexusComm - Unified Communication Hub',
-  description: 'Single-pane-of-glass communication platform',
+  description:
+    'NexusComm is a unified communication platform that brings WhatsApp, SMS, email, Instagram, LinkedIn, Telegram, and Slack into a single inbox. Manage all your conversations in one place with real-time messaging, smart routing, and team collaboration.',
+  keywords: [
+    'unified inbox',
+    'omnichannel messaging',
+    'customer communication',
+    'WhatsApp business',
+    'SMS',
+    'email',
+    'team inbox',
+    'multi-channel support',
+    'real-time chat',
+    'NexusComm',
+  ],
+  authors: [{ name: 'NexusComm Team' }],
+  openGraph: {
+    title: 'NexusComm - Unified Communication Hub',
+    description:
+      'Manage WhatsApp, SMS, email, Instagram, LinkedIn, Telegram, and Slack conversations in a single unified inbox.',
+    type: 'website',
+    siteName: 'NexusComm',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NexusComm - Unified Communication Hub',
+    description:
+      'All your messaging channels in one place. Real-time, unified, and collaborative.',
+  },
   icons: {
     icon: '/icon.svg',
   },
