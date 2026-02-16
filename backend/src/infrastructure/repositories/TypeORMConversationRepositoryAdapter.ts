@@ -176,11 +176,18 @@ export class TypeORMConversationRepositoryAdapter implements ConversationReposit
     const type: 'direct' | 'group' | 'channel' =
       entity.participantIds.length <= 2 ? 'direct' : 'group';
 
+    // Include the conversation owner (userId) in participantIds so that
+    // domain-level isParticipant() checks pass for the owning user.
+    const participantIds = entity.participantIds || [];
+    if (entity.userId && !participantIds.includes(entity.userId)) {
+      participantIds.push(entity.userId);
+    }
+
     return new Conversation({
       id: entity.id,
       name: entity.participantNames?.[0] || undefined,
       type,
-      participantIds: entity.participantIds || [],
+      participantIds,
       isArchived: entity.isArchived || false,
       isMuted: entity.isMuted || false,
       unreadCount: entity.unreadCount || 0,

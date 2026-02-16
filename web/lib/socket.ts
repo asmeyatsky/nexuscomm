@@ -5,6 +5,33 @@ let socket: Socket | null = null;
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
+export interface SocketMessage {
+  id: string;
+  conversationId: string;
+  content: string;
+  senderExternalId: string;
+  senderName: string;
+  direction: 'inbound' | 'outbound';
+  channelType: string;
+  createdAt: string;
+  isRead: boolean;
+  status: string;
+}
+
+export interface ConversationUpdatePayload {
+  id: string;
+  lastMessage?: string;
+  lastMessageDirection?: 'inbound' | 'outbound';
+  lastMessageTimestamp?: string;
+  unreadCount?: number;
+}
+
+export interface TypingPayload {
+  conversationId: string;
+  userId: string;
+  displayName: string;
+}
+
 export function initSocket(): Socket {
   if (socket?.connected) {
     return socket;
@@ -22,18 +49,6 @@ export function initSocket(): Socket {
     reconnectionAttempts: 5,
   });
 
-  socket.on('connect', () => {
-    console.log('✅ WebSocket connected');
-  });
-
-  socket.on('disconnect', () => {
-    console.log('❌ WebSocket disconnected');
-  });
-
-  socket.on('error', (error) => {
-    console.error('WebSocket error:', error);
-  });
-
   return socket;
 }
 
@@ -48,34 +63,31 @@ export function closeSocket(): void {
   }
 }
 
-// Event listeners
-export function onMessageReceived(callback: (data: any) => void): void {
+export function onMessageReceived(callback: (data: SocketMessage) => void): () => void {
   const s = socket || initSocket();
   s.on('message:received', callback);
+  return () => { s.off('message:received', callback); };
 }
 
-export function onConversationUpdate(callback: (data: any) => void): void {
+export function onConversationUpdate(callback: (data: ConversationUpdatePayload) => void): () => void {
   const s = socket || initSocket();
   s.on('conversation:updated', callback);
+  return () => { s.off('conversation:updated', callback); };
 }
 
-export function onTypingStart(callback: (data: any) => void): void {
+export function onTypingStart(callback: (data: TypingPayload) => void): () => void {
   const s = socket || initSocket();
   s.on('typing:started', callback);
+  return () => { s.off('typing:started', callback); };
 }
 
-export function onTypingStop(callback: (data: any) => void): void {
+export function onTypingStop(callback: (data: TypingPayload) => void): () => void {
   const s = socket || initSocket();
   s.on('typing:stopped', callback);
+  return () => { s.off('typing:stopped', callback); };
 }
 
-export function onPresenceChanged(callback: (data: any) => void): void {
-  const s = socket || initSocket();
-  s.on('presence:changed', callback);
-}
-
-// Event emitters
-export function emitMessage(data: any): void {
+export function emitMessage(data: { conversationId: string; content: string }): void {
   const s = socket || initSocket();
   s.emit('message:send', data);
 }

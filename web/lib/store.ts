@@ -78,6 +78,8 @@ export interface ConversationState {
   setConversations: (conversations: Conversation[]) => void;
   selectConversation: (id: string) => void;
   setLoading: (loading: boolean) => void;
+  updateConversation: (id: string, updates: Partial<Conversation>) => void;
+  addMessageToConversation: (conversationId: string, message: string, direction: 'inbound' | 'outbound') => void;
 }
 
 export const useConversationStore = create<ConversationState>((set) => ({
@@ -87,15 +89,39 @@ export const useConversationStore = create<ConversationState>((set) => ({
   setConversations: (conversations) => set({ conversations }),
   selectConversation: (id) => set({ selectedId: id }),
   setLoading: (isLoading) => set({ isLoading }),
+  updateConversation: (id, updates) =>
+    set((state) => ({
+      conversations: state.conversations.map((c) =>
+        c.id === id ? { ...c, ...updates } : c
+      ),
+    })),
+  addMessageToConversation: (conversationId, message, direction) =>
+    set((state) => ({
+      conversations: state.conversations.map((c) =>
+        c.id === conversationId
+          ? {
+              ...c,
+              lastMessage: message,
+              lastMessageDirection: direction,
+              lastMessageTimestamp: new Date().toISOString(),
+              unreadCount: direction === 'inbound' ? c.unreadCount + 1 : c.unreadCount,
+            }
+          : c
+      ),
+    })),
 }));
 
-// Theme Store
-export interface ThemeState {
-  isDark: boolean;
-  toggleTheme: () => void;
+// Sidebar collapse store
+export interface SidebarState {
+  isCollapsed: boolean;
+  isMobileOpen: boolean;
+  toggleCollapsed: () => void;
+  setMobileOpen: (open: boolean) => void;
 }
 
-export const useThemeStore = create<ThemeState>((set) => ({
-  isDark: false,
-  toggleTheme: () => set((state) => ({ isDark: !state.isDark })),
+export const useSidebarStore = create<SidebarState>((set) => ({
+  isCollapsed: false,
+  isMobileOpen: false,
+  toggleCollapsed: () => set((state) => ({ isCollapsed: !state.isCollapsed })),
+  setMobileOpen: (isMobileOpen) => set({ isMobileOpen }),
 }));

@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
 interface ThemeProviderProps {
   children: React.ReactNode;
-  attribute?: string;
+  attribute?: 'class' | 'data-theme';
   defaultTheme?: string;
   enableSystem?: boolean;
 }
@@ -15,12 +15,14 @@ export function ThemeProvider({
   defaultTheme = 'system',
   enableSystem = true,
 }: ThemeProviderProps) {
-  React.useEffect(() => {
-    if (enableSystem) {
-      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.classList.toggle('dark', isDark);
-    }
-  }, [enableSystem]);
-
-  return <>{children}</>;
+  return (
+    <NextThemesProvider
+      attribute={attribute}
+      defaultTheme={defaultTheme}
+      enableSystem={enableSystem}
+      disableTransitionOnChange
+    >
+      {children}
+    </NextThemesProvider>
+  );
 }

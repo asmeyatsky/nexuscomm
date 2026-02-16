@@ -6,7 +6,6 @@ import { ToastProvider } from '@/lib/toast-provider';
 export const metadata: Metadata = {
   title: 'NexusComm - Unified Communication Hub',
   description: 'Single-pane-of-glass communication platform',
-  viewport: 'width=device-width, initial-scale=1',
   icons: {
     icon: '/icon.svg',
   },
@@ -24,7 +23,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#3b82f6" />
       </head>
-      <body>
+      <body className="bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ToastProvider>{children}</ToastProvider>
         </ThemeProvider>
